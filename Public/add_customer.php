@@ -3,11 +3,7 @@ require_once '../Config/db_config.php';
 
 try {
     // Verbinden met database
-    $conn = new PDO(
-        "mysql:host=" . DB_HOSTNAME . ";dbname=" . DB_NAME . ";charset=utf8",
-        DB_USERNAME,
-        DB_PASSWORD
-    );
+    $conn = new PDO("mysql:host=" . DB_HOSTNAME . ";dbname=" . DB_NAME . ";charset=utf8", DB_USERNAME, DB_PASSWORD);
 
     // Zet PDO in error mode
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -26,8 +22,8 @@ try {
     }
 
     // SQL voorbereiden
-    $sql = "INSERT INTO customers 
-            (voornaam, tussenvoegsel, achternaam, emailadres, telefoonnummer, adres)
+    $sql = "INSERT INTO klanten 
+            (voornaam, tussenvoegsel, achternaam, email, telefoonnummer, adres)
             VALUES 
             (:voornaam, :tussenvoegsel, :achternaam, :emailadres, :telefoonnummer, :adres)";
 
