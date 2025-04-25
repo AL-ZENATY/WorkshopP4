@@ -6,10 +6,13 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
 
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Gegevens Pagina</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gegevens Pagina</title>
 </head>
+
 <body>
     <h1>Welkom, <?= htmlspecialchars($adminName) ?>!</h1>
     <h2>Dit is de gegevens pagina.</h2>
@@ -36,4 +39,5 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
         <input type="submit" value="Klant toevoegen">
     </form>
 </body>
+
 </html>
