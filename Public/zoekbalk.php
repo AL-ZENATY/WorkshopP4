@@ -1,3 +1,7 @@
+<?php
+include("./zoekendata.php");
+$zoekennaarnaam= new Zoeken();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +20,16 @@
 if (isset($_POST["zoekenknop"]))
 {
     $zoeken = $_POST['zoeken'];
-    $detail = $user->insertGebruiker($zoeken);
+    $detail = $zoekennaarnaam->zoeken($zoeken);
+    echo "<table>";
+    foreach($zoekennaarnaam as $naam)
+    {
+        echo "<tr>";
+        echo "<td>";
+        echo $naam['firstName'];
+        echo "</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
 }
 ?>
