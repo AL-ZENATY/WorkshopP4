@@ -50,13 +50,13 @@ $huidig = $klant->getKlantById($id);
         <th>Adres</th>
     </tr>
     <tr>
-        <td><?php echo $huidig['id']; ?></td><br>
-        <td><?php echo $huidig['voornaam']; ?></td><br>
-        <td><?php echo $huidig['tussenvoegsel']; ?></td><br>
-        <td><?php echo $huidig['achternaam']; ?></td><br>
-        <td><?php echo $huidig['email']; ?></td><br>
-        <td><?php echo $huidig['telefoonnummer']; ?></td><br>
-        <td><?php echo $huidig['adres']; ?></td><br>
+        <td><?php echo $huidig['id']; ?></td>
+        <td><?php echo $huidig['voornaam']; ?></td>
+        <td><?php echo $huidig['tussenvoegsel']; ?></td>
+        <td><?php echo $huidig['achternaam']; ?></td>
+        <td><?php echo $huidig['email']; ?></td>
+        <td><?php echo $huidig['telefoonnummer']; ?></td>
+        <td><?php echo $huidig['adres']; ?></td>
     </tr>
 </table>
 <a href="overzicht pagina.php">Terug naar overzicht pagina</a>

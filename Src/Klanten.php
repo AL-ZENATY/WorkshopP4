@@ -9,7 +9,7 @@ class Klanten extends Database
     }
     public function getAllKlanten()
     {
-        $query = "SELECT * FROM klanten ";
+        $query = "SELECT * FROM Klanten ";
         return parent::voerQueryUit($query);
     }
 
@@ -17,7 +17,7 @@ class Klanten extends Database
     {
         $query = "SELECT * FROM klanten WHERE id = ? ";
         $params = [$id];
-        return parent::voerQueryUit($query, $params)[0];
+        return parent::voerQueryUit($query, $params)[0] ?? null;
     }
 
     public function addKlant($voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres)
