@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Gegenereerd op: 25 apr 2025 om 11:12
+-- Gegenereerd op: 25 apr 2025 om 11:24
 -- Serverversie: 5.7.17
 -- PHP-versie: 8.2.16
 
@@ -32,6 +32,7 @@ USE `klusjesman`;
 CREATE TABLE `gebruikers` (
   `Id` int(11) DEFAULT NULL,
   `Voornaam` varchar(20) COLLATE utf8_bin NOT NULL,
+  `Tussenvoegsel` varchar(20) COLLATE utf8_bin NOT NULL,
   `Achternaam` varchar(20) COLLATE utf8_bin NOT NULL,
   `Adres` varchar(20) COLLATE utf8_bin NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -44,11 +45,12 @@ CREATE TABLE `gebruikers` (
 
 CREATE TABLE `klanten` (
   `Id` int(11) DEFAULT NULL,
-  `Adres` varchar(20) COLLATE utf8_bin NOT NULL,
-  `Telefoonnummer` varchar(20) COLLATE utf8_bin NOT NULL,
-  `Email` varchar(20) COLLATE utf8_bin NOT NULL,
   `Voornaam` varchar(20) COLLATE utf8_bin NOT NULL,
-  `Achternaam` varchar(20) COLLATE utf8_bin NOT NULL
+  `Tussenvoegsel` varchar(20) COLLATE utf8_bin NOT NULL,
+  `Achternaam` varchar(20) COLLATE utf8_bin NOT NULL,
+  `Email` varchar(20) COLLATE utf8_bin NOT NULL,
+  `Telefoonnummer` varchar(20) COLLATE utf8_bin NOT NULL,
+  `Adres` varchar(20) COLLATE utf8_bin NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 COMMIT;
 
