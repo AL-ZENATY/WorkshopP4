@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Gegenereerd op: 25 apr 2025 om 11:24
+-- Gegenereerd op: 13 mei 2025 om 11:52
 -- Serverversie: 5.7.17
 -- PHP-versie: 8.2.16
 
@@ -44,14 +44,27 @@ CREATE TABLE `gebruikers` (
 --
 
 CREATE TABLE `klanten` (
-  `Id` int(11) DEFAULT NULL,
+  `Id` int(11) NOT NULL,
   `Voornaam` varchar(20) COLLATE utf8_bin NOT NULL,
   `Tussenvoegsel` varchar(20) COLLATE utf8_bin NOT NULL,
   `Achternaam` varchar(20) COLLATE utf8_bin NOT NULL,
   `Email` varchar(20) COLLATE utf8_bin NOT NULL,
   `Telefoonnummer` varchar(20) COLLATE utf8_bin NOT NULL,
-  `Adres` varchar(20) COLLATE utf8_bin NOT NULL
+  `Straat` varchar(30) COLLATE utf8_bin NOT NULL,
+  `Huisnummer` double NOT NULL,
+  `Postcode` varchar(20) COLLATE utf8_bin NOT NULL,
+  `Plaats` varchar(20) COLLATE utf8_bin NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Indexen voor geëxporteerde tabellen
+--
+
+--
+-- Indexen voor tabel `klanten`
+--
+ALTER TABLE `klanten`
+  ADD PRIMARY KEY (`Id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

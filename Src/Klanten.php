@@ -17,14 +17,7 @@ class Klanten extends Database
     {
         $query = "SELECT * FROM klanten WHERE id = ? ";
         $params = [$id];
-        return parent::voerQueryUit($query, $params)[0] ?? null;
-    }
-
-    public function addKlant($voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres)
-    {
-        $query = "INSERT INTO klanten (klantnaam, email, telefoonnumer, adres) VALUES (?, ?, ?, ?)";
-        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres];
-        return parent::voerQueryUit($query, $params);
+        return parent::voerQueryUit($query, $params)[0];
     }
     public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres)
     {

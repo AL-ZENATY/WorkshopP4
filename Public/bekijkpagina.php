@@ -1,9 +1,10 @@
 <?php
-include "../src/Klanten.php";
+include "../Src/Klanten.php";
 
 $klant = new Klanten();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id'];
     $voornaam = $_POST['voornaam'];
     $tussenvoegsel = $_POST['tussenvoegsel'];
     $achternaam = $_POST['achternaam'];
@@ -12,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adres = $_POST['adres'];
 
     $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres);
-    header("Location: index.php");
+    header("Location: klanten toevoegen en Overzicht.php");
     exit;
 }
 
@@ -59,4 +60,4 @@ $huidig = $klant->getKlantById($id);
         <td><?php echo $huidig['adres']; ?></td>
     </tr>
 </table>
-<a href="overzicht pagina.php">Terug naar overzicht pagina</a>
+<a href="klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
