@@ -9,30 +9,24 @@ class Klanten extends Database
     }
     public function getAllKlanten()
     {
-        $query = "SELECT * FROM klanten ";
+        $query = "SELECT * FROM Klanten ";
         return parent::voerQueryUit($query);
     }
 
-    public function getKlantById($id)
+    public function getklantById($id)
     {
         $query = "SELECT * FROM klanten WHERE id = ? ";
         $params = [$id];
         return parent::voerQueryUit($query, $params)[0];
     }
 
-    public function addKlant($voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres)
+    public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats)
     {
-        $query = "INSERT INTO klanten (klantnaam, email, telefoonnumer, adres) VALUES (?, ?, ?, ?)";
-        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres];
+        $query = "UPDATE klanten SET voornaam = ?, tussenvoegsel = ?, achternaam = ?, email = ?, telefoonnummer = ?, straat = ?, huisnummer = ?, postcode = ?, woonplaats = ? WHERE id = ?";
+        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats, $id];
         return parent::voerQueryUit($query, $params);
     }
-    public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres)
-    {
-        $query = "UPDATE klanten SET klantnaam = ?, email = ?, telefoonnumer = ?, adres = ? WHERE id = ?";
-        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres, $id];
-        return parent::voerQueryUit($query, $params);
-    }
-
+    
     public function deleteKlant($id)
     {
         $query = "DELETE FROM klanten WHERE id = ? ";

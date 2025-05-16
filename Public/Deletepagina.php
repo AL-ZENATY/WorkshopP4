@@ -8,7 +8,7 @@ if (isset($_GET['id'])) {
     $klant->deleteKlant($id);
 
     echo json_encode(['status' => 'success']);
-    header("Location: overzicht pagina.php");
+    header("Location:  klanten toevoegen.php");
     exit;
 }
 
