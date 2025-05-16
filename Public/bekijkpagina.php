@@ -10,15 +10,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $achternaam = $_POST['achternaam'];
     $email = $_POST['email'];
     $telefoonnummer = $_POST['telefoonnummer'];
-    $adres = $_POST['adres'];
-
-    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres);
+    $straat = $_POST['straat'];
+    $huisnummer = $_POST['huisnummer']; 
+    $postcode = $_POST['postcode'];
+    $woonplaats = $_POST['woonplaats'];
+    
+    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats);
     header("Location: klanten toevoegen en Overzicht.php");
     exit;
+} elseif (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $huidig = $klant->getKlantById($id);
 }
 
-$id = $_GET['id'];
-$huidig = $klant->getKlantById($id);
+$klantenLijst = $klant->getAllKlanten();
 ?>
 
 <style>
@@ -48,16 +53,22 @@ $huidig = $klant->getKlantById($id);
         <th>Achternaam</th>
         <th>Email</th>
         <th>Telefoonnummer</th>
-        <th>Adres</th>
+        <th>Straat</th>
+        <th>Huisnummer</th>
+        <th>Postcode</th>
+        <th>Woonplaats</th>
     </tr>
     <tr>
-        <td><?php echo $huidig['id']; ?></td>
-        <td><?php echo $huidig['voornaam']; ?></td>
-        <td><?php echo $huidig['tussenvoegsel']; ?></td>
-        <td><?php echo $huidig['achternaam']; ?></td>
-        <td><?php echo $huidig['email']; ?></td>
-        <td><?php echo $huidig['telefoonnummer']; ?></td>
-        <td><?php echo $huidig['adres']; ?></td>
+        <td><?php echo $klantenLijst['id']; ?></td>
+        <td><?php echo $klantenLijst['voornaam']; ?></td>
+        <td><?php echo $klantenLijst['tussenvoegsel']; ?></td>
+        <td><?php echo $klantenLijst['achternaam']; ?></td>
+        <td><?php echo $klantenLijst['email']; ?></td>
+        <td><?php echo $klantenLijst['telefoonnummer']; ?></td>
+        <td><?php echo $klantenLijst['straat']; ?></td>
+        <td><?php echo $klantenLijst['huisnummer']; ?></td>
+        <td><?php echo $klantenLijst['postcode']; ?></td>
+        <td><?php echo $klantenLijst['woonplaats']; ?></td>
     </tr>
 </table>
 <a href="klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
