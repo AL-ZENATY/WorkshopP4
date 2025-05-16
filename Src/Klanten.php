@@ -13,7 +13,7 @@ class Klanten extends Database
         return parent::voerQueryUit($query);
     }
 
-    public function getKlantById($id)
+    public function getklantById($id)
     {
         $query = "SELECT * FROM klanten WHERE id = ? ";
         $params = [$id];
@@ -25,7 +25,7 @@ class Klanten extends Database
         $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats, $id];
         return parent::voerQueryUit($query, $params);
     }
-
+    
     public function deleteKlant($id)
     {
         $query = "DELETE FROM klanten WHERE id = ? ";
