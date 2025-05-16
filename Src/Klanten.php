@@ -13,14 +13,13 @@ class Klanten extends Database
         return parent::voerQueryUit($query);
     }
 
-    public function getKlantById($id) {
-    $query = "SELECT * FROM klanten WHERE id = ?";
-    $resultaat = parent::voerQueryUit($query, [$id]);
-    if (!$resultaat || count($resultaat) === 0) {
-        return null;
+    public function getklantById($id)
+    {
+        $query = "SELECT * FROM klanten WHERE id = ? ";
+        $params = [$id];
+        return parent::voerQueryUit($query, $params)[0];
     }
-    return $resultaat[0];
-}
+
     public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats)
     {
         $query = "UPDATE klanten SET voornaam = ?, tussenvoegsel = ?, achternaam = ?, email = ?, telefoonnummer = ?, straat = ?, huisnummer = ?, postcode = ?, woonplaats = ? WHERE id = ?";

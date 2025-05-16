@@ -11,19 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $telefoonnummer = $_POST['telefoonnummer'];
     $straat = $_POST['straat'];
-    $huisnummer = $_POST['huisnummer']; 
+    $huisnummer = $_POST['huisnummer'];
     $postcode = $_POST['postcode'];
     $woonplaats = $_POST['woonplaats'];
-    
-    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats);
+    $notities = $_POST['notities'];
+
+    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats, $notities);
     header("Location: klanten toevoegen en Overzicht.php");
     exit;
-} elseif (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $huidig = $klant->getKlantById($id);
 }
 
-$klantenLijst = $klant->getAllKlanten();
+$id = $_GET['id'];
+$huidig = $klant->getKlantById($id);
 ?>
 
 <style>
@@ -45,30 +44,54 @@ $klantenLijst = $klant->getAllKlanten();
 </style>
 
 <table border="1">
-    <h1>Klanten Bekijken</h1>
+    <h1>Cijfer Bekijken</h1>
     <tr>
-        <th>Id</th>
-        <th>Voornaam</th>
-        <th>Tussenvoegsel</th>
-        <th>Achternaam</th>
-        <th>Email</th>
-        <th>Telefoonnummer</th>
-        <th>Straat</th>
-        <th>Huisnummer</th>
-        <th>Postcode</th>
-        <th>Woonplaats</th>
+        <th>Veld</th>
+        <th>Waarde</th>
     </tr>
     <tr>
-        <td><?php echo $klantenLijst['id']; ?></td>
-        <td><?php echo $klantenLijst['voornaam']; ?></td>
-        <td><?php echo $klantenLijst['tussenvoegsel']; ?></td>
-        <td><?php echo $klantenLijst['achternaam']; ?></td>
-        <td><?php echo $klantenLijst['email']; ?></td>
-        <td><?php echo $klantenLijst['telefoonnummer']; ?></td>
-        <td><?php echo $klantenLijst['straat']; ?></td>
-        <td><?php echo $klantenLijst['huisnummer']; ?></td>
-        <td><?php echo $klantenLijst['postcode']; ?></td>
-        <td><?php echo $klantenLijst['woonplaats']; ?></td>
+        <td>Id</td>
+        <td><?php echo $huidig['id']; ?></td>
+    </tr>
+    <tr>
+        <td>Voornaam</td>
+        <td><?php echo $huidig['voornaam']; ?></td>
+    </tr>
+    <tr>
+        <td>Tussenvoegsel</td>
+        <td><?php echo $huidig['tussenvoegsel']; ?></td>
+    </tr>
+    <tr>
+        <td>Achternaam</td>
+        <td><?php echo $huidig['achternaam']; ?></td>
+    </tr>
+    <tr>
+        <td>Email</td>
+        <td><?php echo $huidig['email']; ?></td>
+    </tr>
+    <tr>
+        <td>Telefoonnummer</td>
+        <td><?php echo $huidig['telefoonnummer']; ?></td>
+    </tr>
+    <tr>
+        <td>Straat</td>
+        <td><?php echo $huidig['straat']; ?></td>
+    </tr>
+    <tr>
+        <td>Huisnummer</td>
+        <td><?php echo $huidig['huisnummer']; ?></td>
+    </tr>
+    <tr>
+        <td>Postcode</td>
+        <td><?php echo $huidig['postcode']; ?></td>
+    </tr>
+    <tr>
+        <td>Woonplaats</td>
+        <td><?php echo $huidig['woonplaats']; ?></td>
+    </tr>
+    <tr>
+        <td>Notities</td>
+        <td><textarea style="width:200px; height:100px;" placeholder="Notities"></textarea></td>
     </tr>
 </table>
-<a href="klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
+<a href="Klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
