@@ -21,7 +21,7 @@ class Klanten extends Database
     }
     public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres)
     {
-        $query = "UPDATE klanten SET klantnaam = ?, email = ?, telefoonnumer = ?, adres = ? WHERE id = ?";
+        $query = "UPDATE klanten SET voornaam = ?, tussenvoegsel = ? achternaam = ?, email = ?, telefoonnumer = ?, adres = ? WHERE id = ?";
         $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres, $id];
         return parent::voerQueryUit($query, $params);
     }
