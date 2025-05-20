@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Gegenereerd op: 20 mei 2025 om 11:20
+-- Gegenereerd op: 20 mei 2025 om 11:24
 -- Serverversie: 5.7.17
 -- PHP-versie: 8.2.16
 
