@@ -82,7 +82,7 @@
             border-collapse: collapse;
             width: 95%;
             max-width: 1100px;
-            background-color: #fff;
+            background-color: #ffff;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
