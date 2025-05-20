@@ -4,12 +4,12 @@ class Klanten extends Database
 {
     public function ZoekKlanten()
     {
-        $query = "SELECT * FROM Klanten ";
+        $query = "SELECT * FROM klanten ";
         return parent::voerQueryUit($query);
     }
     public function getAllKlanten()
     {
-        $query = "SELECT * FROM Klanten ";
+        $query = "SELECT * FROM klanten ";
         return parent::voerQueryUit($query);
     }
 
@@ -19,11 +19,10 @@ class Klanten extends Database
         $params = [$id];
         return parent::voerQueryUit($query, $params)[0];
     }
-
-    public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats)
+    public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats)
     {
-        $query = "UPDATE klanten SET voornaam = ?, tussenvoegsel = ?, achternaam = ?, email = ?, telefoonnummer = ?, straat = ?, huisnummer = ?, postcode = ?, woonplaats = ? WHERE id = ?";
-        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats, $id];
+        $query = "UPDATE klanten SET klantnaam = ?, email = ?, telefoonnumer = ?, straat = ?, huisnummer = ?, postcode = ?, plaats = ? WHERE id = ?";
+        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats, $id];
         return parent::voerQueryUit($query, $params);
     }
     

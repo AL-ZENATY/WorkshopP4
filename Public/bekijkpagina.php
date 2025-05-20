@@ -3,6 +3,7 @@ include "../Src/Klanten.php";
 
 $klant = new Klanten();
 
+// Handle POST (update) - als dat nog nodig is
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'];
     $voornaam = $_POST['voornaam'];
@@ -20,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-$id = $_GET['id'];
-$huidig = $klant->getKlantById($id);
+// Haal alle klanten op voor overzicht
+$klantenLijst = $klant->getAllKlanten();
 ?>
 
 <style>
@@ -40,57 +41,49 @@ $huidig = $klant->getKlantById($id);
     th {
         background-color: #f2f2f2;
     }
+
+    a {
+        color: black;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: rgb(70, 229, 112);
+    }
 </style>
 
+<h1>Klanten Overzicht</h1>
+
 <table border="1">
-    <h1>Cijfer Bekijken</h1>
     <tr>
-        <th>Veld</th>
-        <th>Waarde</th>
+        <th>Id</th>
+        <th>Voornaam</th>
+        <th>Tussenvoegsel</th>
+        <th>Achternaam</th>
+        <th>Email</th>
+        <th>Telefoonnummer</th>
+        <th>Straat</th>
+        <th>Huisnummer</th>
+        <th>Postcode</th>
+        <th>Plaats</th>
+        <th>Details</th>
     </tr>
+
+    <?php foreach ($klantenLijst as $huidig): ?>
     <tr>
-        <td>Id</td>
         <td><?php echo $huidig['id']; ?></td>
-    </tr>
-    <tr>
-        <td>Voornaam</td>
         <td><?php echo $huidig['voornaam']; ?></td>
-    </tr>
-    <tr>
-        <td>Tussenvoegsel</td>
         <td><?php echo $huidig['tussenvoegsel']; ?></td>
-    </tr>
-    <tr>
-        <td>Achternaam</td>
         <td><?php echo $huidig['achternaam']; ?></td>
-    </tr>
-    <tr>
-        <td>Email</td>
         <td><?php echo $huidig['email']; ?></td>
-    </tr>
-    <tr>
-        <td>Telefoonnummer</td>
         <td><?php echo $huidig['telefoonnummer']; ?></td>
-    </tr>
-    <tr>
-        <td>Straat</td>
         <td><?php echo $huidig['straat']; ?></td>
-    </tr>
-    <tr>
-        <td>Huisnummer</td>
         <td><?php echo $huidig['huisnummer']; ?></td>
-    </tr>
-    <tr>
-        <td>Postcode</td>
         <td><?php echo $huidig['postcode']; ?></td>
+        <td><?php echo $huidig['plaats']; ?></td>
+        <td><a href="bekijkpagina.php?id=<?php echo $huidig['id']; ?>">Meer</a></td>
     </tr>
-    <tr>
-        <td>Woonplaats</td>
-        <td><?php echo $huidig['woonplaats']; ?></td>
-    </tr>
-    <tr>
-        <td>Notities</td>
-        <td><textarea style="width:200px; height:100px;" placeholder="Notities"></textarea></td>
-    </tr>
+    <?php endforeach; ?>
 </table>
-<a href="Klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
+
+<a href="klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
