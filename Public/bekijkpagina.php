@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postcode = $_POST['postcode'];
     $woonplaats = $_POST['woonplaats'];
     $notities = $_POST['notities'];
-
+    
     $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats, $notities);
     header("Location: klanten toevoegen en Overzicht.php");
     exit;
@@ -28,70 +28,69 @@ $huidig = $klant->getKlantById($id);
 <style>
     table {
         border-collapse: collapse;
-        width: 100%;
+        max-width: 1000px;
     }
-
-    th,
-    td {
+    th, td {
         border: 1px solid black;
         padding: 8px;
         text-align: left;
     }
-
     th {
         background-color: #f2f2f2;
     }
+    a {
+        color: black;
+    }
+    a:hover {
+        text-decoration: underline;
+        color: rgb(70, 229, 112);
+    }
 </style>
 
-<table border="1">
-    <h1>Cijfer Bekijken</h1>
-    <tr>
-        <th>Veld</th>
-        <th>Waarde</th>
-    </tr>
-    <tr>
-        <td>Id</td>
-        <td><?php echo $huidig['id']; ?></td>
-    </tr>
-    <tr>
-        <td>Voornaam</td>
-        <td><?php echo $huidig['voornaam']; ?></td>
-    </tr>
-    <tr>
-        <td>Tussenvoegsel</td>
-        <td><?php echo $huidig['tussenvoegsel']; ?></td>
-    </tr>
-    <tr>
-        <td>Achternaam</td>
-        <td><?php echo $huidig['achternaam']; ?></td>
-    </tr>
-    <tr>
-        <td>Email</td>
-        <td><?php echo $huidig['email']; ?></td>
-    </tr>
-    <tr>
-        <td>Telefoonnummer</td>
-        <td><?php echo $huidig['telefoonnummer']; ?></td>
-    </tr>
-    <tr>
-        <td>Straat</td>
-        <td><?php echo $huidig['straat']; ?></td>
-    </tr>
-    <tr>
-        <td>Huisnummer</td>
-        <td><?php echo $huidig['huisnummer']; ?></td>
-    </tr>
-    <tr>
-        <td>Postcode</td>
-        <td><?php echo $huidig['postcode']; ?></td>
-    </tr>
-    <tr>
-        <td>Woonplaats</td>
-        <td><?php echo $huidig['woonplaats']; ?></td>
-    </tr>
-    <tr>
-        <td>Notities</td>
-        <td><textarea style="width:200px; height:100px;" placeholder="Notities"></textarea></td>
-    </tr>
-</table>
-<a href="Klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
+
+<h1>Klantgegevens</h1>
+<form method="post">
+    <input type="hidden" name="id" value="<?php echo $huidig['Id']; ?>">
+    <input type="hidden" name="voornaam" value="<?php echo $huidig['Voornaam']; ?>">
+    <input type="hidden" name="tussenvoegsel" value="<?php echo $huidig['Tussenvoegsel']; ?>">
+    <input type="hidden" name="achternaam" value="<?php echo $huidig['Achternaam']; ?>">
+    <input type="hidden" name="email" value="<?php echo $huidig['Email']; ?>">
+    <input type="hidden" name="telefoonnummer" value="<?php echo $huidig['Telefoonnummer']; ?>">
+    <input type="hidden" name="straat" value="<?php echo $huidig['Straat']; ?>">
+    <input type="hidden" name="huisnummer" value="<?php echo $huidig['Huisnummer']; ?>">
+    <input type="hidden" name="postcode" value="<?php echo $huidig['Postcode']; ?>">
+    <input type="hidden" name="woonplaats" value="<?php echo $huidig['Plaats']; ?>">
+
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Voornaam</th>
+            <th>Tussenvoegsel</th>
+            <th>Achternaam</th>
+            <th>Email</th>
+            <th>Telefoonnummer</th>
+            <th>Straat</th>
+            <th>Huisnummer</th>
+            <th>Postcode</th>
+            <th>Plaats</th>
+            <th>Notities</th>
+        </tr>
+        <tr>
+            <td><?php echo $huidig['Id']; ?></td>
+            <td><?php echo $huidig['Voornaam']; ?></td>
+            <td><?php echo $huidig['Tussenvoegsel']; ?></td>
+            <td><?php echo $huidig['Achternaam']; ?></td>
+            <td><?php echo $huidig['Email']; ?></td>
+            <td><?php echo $huidig['Telefoonnummer']; ?></td>
+            <td><?php echo $huidig['Straat']; ?></td>
+            <td><?php echo $huidig['Huisnummer']; ?></td>
+            <td><?php echo $huidig['Postcode']; ?></td>
+            <td><?php echo $huidig['Plaats']; ?></td>
+            <td>
+                <textarea name="notities" style="width: 100px; height: 100px;"><?php echo $huidig['Notities']; ?></textarea>
+                <button type="submit" class="NotitieOpslaan" style="width: 100px;">Opslaan</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<a href="klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
