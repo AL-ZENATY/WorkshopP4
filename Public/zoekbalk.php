@@ -4,7 +4,7 @@ $zoekenNaarObject= new zoeken();
 ?>
 <form method="POST"> 
     <input type="radio" id="naam" name="keuze" value="naam" class="naam"> Naam
-    <input type="radio" id="Adres" name="keuze" value="Adres" class="Adres"> Adres<br>
+    <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats<br>
     zoeken: <input type="text" name="zoekwaarde">
     <input type="submit" value="zoeken" name="zoeken">
 </form>
@@ -20,7 +20,7 @@ if ($naamOfAdress == "naam")
 {
     $gezochtItems = $zoekenNaarObject->getKlantenMetNaam($naamZoeken);
 }
-elseif ($naamOfAdress == "Adres")
+elseif ($naamOfAdress == "Woonplaats")
 {
     $gezochtItems = $zoekenNaarObject->getKlantenMetWoonplaats($naamZoeken);
 }
