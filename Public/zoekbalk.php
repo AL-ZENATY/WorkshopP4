@@ -1,34 +1,31 @@
 <?php
 include "../src/Zoeken.php";
-$zoekennaar= new zoeken();
+$zoekenNaarObject= new zoeken();
 ?>
 <form method="POST"> 
-    <input type="radio" id="zoekennaar" name="zoekennaar" class="naam"> naam
-    <input type="radio" id="zoekennaar" name="zoekennaar" class="woonplaats"> woonplaats<br>
-    zoeken: <input type="text" name="zoekennaarr">
+    <input type="radio" id="naam" name="keuze" value="naam" class="naam"> Naam
+    <input type="radio" id="Adres" name="keuze" value="Adres" class="Adres"> Adres<br>
+    zoeken: <input type="text" name="zoekwaarde">
     <input type="submit" value="zoeken" name="zoeken">
 </form>
 <?php
 
+
 if (isset($_POST["zoeken"]))
 {
-    $zoekennaam = $_POST['zoekennaar'];
-    echo $zoekennaam;
-    $zoekennaars = $_POST['zoekennaarr'];
-if ($zoekennaam == "naam")
+    print_r($_POST);
+    $naamOfAdress = $_POST['keuze'];
+    $naamZoeken = $_POST['zoekwaarde'];
+if ($naamOfAdress == "naam")
 {
-    echo "naam";
-    $zoeken = $zoekennaar->getKlantenMetNaam($zoekennaars);
+    $gezochtItems = $zoekenNaarObject->getKlantenMetNaam($naamZoeken);
 }
-elseif ($zoekennaam == "woonplaats")
+elseif ($naamOfAdress == "Adres")
 {
-    echo "woonplaats";
-    $zoeken = $zoekennaar->getKlantenMetWoonplaats($zoekennaars);
+    $gezochtItems = $zoekenNaarObject->getKlantenMetWoonplaats($naamZoeken);
 }
 else{
     echo "error";
 }
-echo $zoekennaars;
-echo $zoekennaam;
 }
 ?>

@@ -13,10 +13,10 @@ class zoeken extends Database
         $params = [$naam];
         return parent::voerQueryUit($query, $params);
     }
-    public function getKlantenMetWoonplaats($woonplaats)
+    public function getKlantenMetWoonplaats($Adres)
     {
-        $query = "SELECT * FROM klanten WHERE Woonplaats = ? ";
-        $params = [$woonplaats];
+        $query = "SELECT * FROM klanten WHERE Adres = ? ";
+        $params = [$Adres];
         return parent::voerQueryUit($query, $params);
     }
 }
