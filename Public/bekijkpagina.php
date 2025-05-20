@@ -1,23 +1,28 @@
 <?php
-include "../src/Klanten.php";
+include "../Src/Klanten.php";
 
 $klant = new Klanten();
 
+// Handle POST (update) - als dat nog nodig is
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id'];
     $voornaam = $_POST['voornaam'];
     $tussenvoegsel = $_POST['tussenvoegsel'];
     $achternaam = $_POST['achternaam'];
     $email = $_POST['email'];
     $telefoonnummer = $_POST['telefoonnummer'];
-    $adres = $_POST['adres'];
+    $straat = $_POST['straat'] ?? '';
+    $huisnummer = $_POST['huisnummer'] ?? '';
+    $postcode = $_POST['postcode'] ?? '';
+    $plaats = $_POST['plaats'] ?? '';
 
-    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $adres);
-    header("Location: index.php");
+    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats);
+    header("Location: klanten toevoegen en Overzicht.php");
     exit;
 }
 
-$id = $_GET['id'];
-$huidig = $klant->getKlantById($id);
+// Haal alle klanten op voor overzicht
+$klantenLijst = $klant->getAllKlanten();
 ?>
 
 <style>
@@ -36,10 +41,20 @@ $huidig = $klant->getKlantById($id);
     th {
         background-color: #f2f2f2;
     }
+
+    a {
+        color: black;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: rgb(70, 229, 112);
+    }
 </style>
 
+<h1>Klanten Overzicht</h1>
+
 <table border="1">
-    <h1>Klanten Bekijken</h1>
     <tr>
         <th>Id</th>
         <th>Voornaam</th>
@@ -47,16 +62,28 @@ $huidig = $klant->getKlantById($id);
         <th>Achternaam</th>
         <th>Email</th>
         <th>Telefoonnummer</th>
-        <th>Adres</th>
+        <th>Straat</th>
+        <th>Huisnummer</th>
+        <th>Postcode</th>
+        <th>Plaats</th>
+        <th>Details</th>
     </tr>
+
+    <?php foreach ($klantenLijst as $huidig): ?>
     <tr>
-        <td><?php echo $huidig['id']; ?></td><br>
-        <td><?php echo $huidig['voornaam']; ?></td><br>
-        <td><?php echo $huidig['tussenvoegsel']; ?></td><br>
-        <td><?php echo $huidig['achternaam']; ?></td><br>
-        <td><?php echo $huidig['email']; ?></td><br>
-        <td><?php echo $huidig['telefoonnummer']; ?></td><br>
-        <td><?php echo $huidig['adres']; ?></td><br>
+        <td><?php echo htmlspecialchars($huidig['id']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['voornaam']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['tussenvoegsel']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['achternaam']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['email']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['telefoonnummer']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['straat']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['huisnummer']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['postcode']); ?></td>
+        <td><?php echo htmlspecialchars($huidig['plaats']); ?></td>
+        <td><a href="bekijkpagina.php?id=<?php echo urlencode($huidig['id']); ?>">Meer</a></td>
     </tr>
+    <?php endforeach; ?>
 </table>
-<a href="overzicht pagina.php">Terug naar overzicht pagina</a>
+
+<a href="klanten toevoegen en Overzicht.php">Terug naar overzicht pagina</a>
