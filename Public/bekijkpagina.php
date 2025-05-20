@@ -14,9 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $huisnummer = $_POST['huisnummer'];
     $postcode = $_POST['postcode'];
     $woonplaats = $_POST['woonplaats'];
-    $notities = $_POST['notities'];
-
-    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats, $notities);
+    
+    $klant->updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $woonplaats);
     header("Location: klanten toevoegen en Overzicht.php");
     exit;
 }
