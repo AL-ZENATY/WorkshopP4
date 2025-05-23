@@ -190,7 +190,7 @@
                         <td><?= htmlspecialchars($klant['telefoonnummer']) ?></td>
                         <td><?= htmlspecialchars($klant['straat'] . ' ' . $klant['huisnummer'] . ', ' . $klant['postcode'] . ' ' . $klant['plaats']) ?>
                         </td>
-                        <td><a href="bekijkpagina.php?id=<?php echo urlencode($huidig['id']); ?>">Meer</a></td>
+                        <td><a href="bekijkpagina.php?id=<?php echo urlencode($klant['id']); ?>">Meer</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
