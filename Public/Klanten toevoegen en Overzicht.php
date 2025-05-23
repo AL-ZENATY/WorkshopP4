@@ -166,15 +166,15 @@
     <form method="POST">
         <label for="Zoeken">Zoeken:</label>
         <input type="radio" id="Naam" name="keuze" value="Naam" class="Naam"> Naam
-        <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats<br>
+        <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats,<br>
         <input type="text" name="zoekwaarde" placeholder="Naam/Woonplaats">
-        <input type="submit" value="zoeken" name="zoeken">
-        <input type="submit" value="zoekenweg" name="zoekenweg">
+        <input type="submit" value="Zoeken" name="Zoeken">
+        <input type="submit" value="Alles laten zien" name="Zoekenweg">
     </form>
     <?php
     include "../Src/Klanten.php";
     $zoekenNaarObject = new Klanten();
-    if (isset($_POST["zoekenweg"])) {
+    if (isset($_POST["Zoekenweg"])) {
         if (isset($_POST["keuze"])) {
             $_POST['keuze'] == "";
             $naamOfWoonplaats = $_POST['keuze'];
@@ -185,8 +185,7 @@
         }
         $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
     }
-    if (isset($_POST["zoeken"])) {
-        print_r($_POST);
+    if (isset($_POST["Zoeken"])) {
         if (isset($_POST["keuze"])) {
             $naamOfWoonplaats = $_POST['keuze'];
         }
