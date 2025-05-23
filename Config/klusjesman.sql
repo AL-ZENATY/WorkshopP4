@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Gegenereerd op: 20 mei 2025 om 11:01
+-- Gegenereerd op: 20 mei 2025 om 11:24
 -- Serverversie: 5.7.17
 -- PHP-versie: 8.2.16
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `klusjesman`
 --
+CREATE DATABASE IF NOT EXISTS `klusjesman` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
+USE `klusjesman`;
 
 -- --------------------------------------------------------
 

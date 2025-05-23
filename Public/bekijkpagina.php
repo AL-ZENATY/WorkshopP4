@@ -75,6 +75,7 @@ $huidig = $klant->getKlantById($id);
             <th>Plaats</th>
             <th>Notities</th>
         </tr>
+        
         <tr>
             <td><?php echo $huidig['Id']; ?></td>
             <td><?php echo $huidig['Voornaam']; ?></td>
