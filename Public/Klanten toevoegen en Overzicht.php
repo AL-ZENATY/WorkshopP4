@@ -158,8 +158,9 @@
             <input type="text" name="straat" placeholder="straat" required>
             <input type="text" name="huisnummer" placeholder="Huisnummer" required>
             <input type="text" name="postcode" placeholder="Postcode" required>
-            <input type="text" name="plaats" placeholder="Plaats" required>
+            <input type="text" name="plaats" placeholder="Plaats" required>      
         </div>
+        <input type="text" name="notities" placeholder="Notities (Optioneel)">
 
         <input type="submit" value="Klant toevoegen">
     </form>
