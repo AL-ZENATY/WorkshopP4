@@ -30,6 +30,23 @@ if (isset($_GET['delete_note'])) {
 
 // Notities ophalen
 $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDER BY datum_toegevoegd DESC");
+
+// Factuurregels
+$regels = [
+    ['aantal' => 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50],
+    ['aantal' => 0, 'omschrijving' => 'Materiaal kosten', 'prijs' => 25.00],
+    ['aantal' => 0, 'omschrijving' => 'Uurloon', 'prijs' => 7.99],
+];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aantal'])) {
+    foreach ($_POST['aantal'] as $i => $nieuwAantal) {
+        if (isset($regels[$i]) && is_numeric($nieuwAantal)) {
+            $regels[$i]['aantal'] = intval($nieuwAantal);
+        }
+    }
+}
+
+$totaal = 0;
 ?>
 
 <!DOCTYPE html>
@@ -50,14 +67,25 @@ $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDE
             color: #333;
         }
 
+        .flex-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+
         table {
             width: 100%;
             max-width: 900px;
-            margin: 20px 0;
             background-color: white;
             border-collapse: collapse;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
+            margin-bottom: 20px;
         }
 
         th,
@@ -73,7 +101,7 @@ $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDE
 
         textarea {
             width: 100%;
-            max-width: 880px;
+            max-width: 875px;
             min-height: 100px;
             padding: 10px;
             font-size: 16px;
@@ -106,13 +134,15 @@ $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDE
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
-        .notitie small {
-            color: gray;
+        .notitie-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
         }
 
         .verwijder {
             color: red;
-            float: right;
             font-size: 14px;
         }
 
@@ -129,7 +159,6 @@ $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDE
 </head>
 
 <body>
-
     <h1><?= htmlspecialchars($huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam']) ?></h1>
     <h2>Gegevens</h2>
     <table>
@@ -152,27 +181,75 @@ $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDE
         </tr>
     </table>
 
-    <h2>Notitie toevoegen</h2>
-    <form method="post">
-        <textarea name="notitie_inhoud" required></textarea>
-        <br>
-        <button type="submit" class="btn">Voeg toe</button>
-    </form>
+    <div class="flex-container">
+        <div class="column">
+            <h2>Notitie toevoegen</h2>
+            <form method="post">
+                <textarea name="notitie_inhoud" required></textarea>
+                <br>
+                <button type="submit" class="btn">Voeg toe</button>
+            </form>
 
-    <?php if ($notities->num_rows > 0): ?>
-        <h2>Notities</h2>
-        <?php while ($note = $notities->fetch_assoc()): ?>
-            <div class="notitie">
-                <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>"
-                    onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
-                <p><?= nl2br(htmlspecialchars($note['inhoud'])) ?></p>
-                <small>Toegevoegd op: <?= $note['datum_toegevoegd'] ?></small>
-            </div>
-        <?php endwhile; ?>
-    <?php endif; ?>
+            <?php if ($notities->num_rows > 0): ?>
+                <h2>Notities</h2>
+                <?php while ($note = $notities->fetch_assoc()): ?>
+                    <div class="notitie">
+                        <p><?= nl2br(htmlspecialchars($note['inhoud'])) ?></p>
+                        <div class="notitie-footer">
+                            <small>Toegevoegd op: <?= $note['datum_toegevoegd'] ?></small>
+                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>"
+                                onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php endif; ?>
+        </div>
+
+        <div class="column">
+            <h2>Factuur</h2>
+            <form method="post">
+                <table>
+                    <tr>
+                        <th>Aantal</th>
+                        <th>Omschrijving</th>
+                        <th>Prijs</th>
+                        <th>Bedrag</th>
+                    </tr>
+                    <?php foreach ($regels as $i => $regel):
+                        $bedrag = $regel['aantal'] * $regel['prijs'];
+                        $totaal += $bedrag;
+                        ?>
+                        <tr>
+                            <td><input type="number" min="0" name="aantal[<?= $i ?>]"
+                                    value="<?= htmlspecialchars($regel['aantal']) ?>" /></td>
+                            <td><?= htmlspecialchars($regel['omschrijving']) ?></td>
+                            <td>€ <?= number_format($regel['prijs'], 2, ',', '.') ?></td>
+                            <td>€ <?= number_format($bedrag, 2, ',', '.') ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php
+                    $btw = $totaal * 0.21;
+                    $incl = $totaal + $btw;
+                    ?>
+                    <tr>
+                        <td colspan="3" style="text-align:right;"><strong>Subtotaal</strong></td>
+                        <td><strong>€ <?= number_format($totaal, 2, ',', '.') ?></strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align:right;"><strong>BTW (21%)</strong></td>
+                        <td><strong>€ <?= number_format($btw, 2, ',', '.') ?></strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align:right;"><strong>Totaal</strong></td>
+                        <td><strong>€ <?= number_format($incl, 2, ',', '.') ?></strong></td>
+                    </tr>
+                </table>
+                <input type="submit" class="btn" value="Berekenen">
+            </form>
+        </div>
+    </div>
 
     <p><a href="klanten toevoegen en Overzicht.php">← Terug naar overzicht pagina</a></p>
-
 </body>
 
 </html>
