@@ -166,9 +166,13 @@
     </form>
     <form method="POST">
         <label for="Zoeken">Zoeken:</label>
-        <input type="radio" id="Naam" name="keuze" value="Naam" class="Naam"> Naam
-        <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats,<br>
-        <input type="text" name="zoekwaarde" placeholder="Naam/Woonplaats">
+        <input list="options" id="combobox" name="combobox" placeholder="Zoeken op" />
+        <datalist name="keuze" id="options">
+            <option value="Naam">
+            <option value="Achternaam">
+            <option value="Woonplaats">
+        </datalist>
+        <input type="text" name="zoekwaarde" placeholder="Vul in">
         <input type="submit" value="Zoeken" name="Zoeken">
         <input type="submit" value="Alles laten zien" name="Zoekenweg">
     </form>
@@ -176,9 +180,9 @@
     include "../Src/Klanten.php";
     $zoekenNaarObject = new Klanten();
     if (isset($_POST["Zoekenweg"])) {
-        if (isset($_POST["keuze"])) {
-            $_POST['keuze'] == "";
-            $naamOfWoonplaats = $_POST['keuze'];
+        if (isset($_POST["combobox"])) {
+            $_POST['combobox'] == "";
+            $zoekenOp = $_POST['combobox'];
         }
         if (isset($_POST["zoekwaarde"])) {
             $_POST['zoekwaarde'] == "";
@@ -187,25 +191,28 @@
         $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
     }
     if (isset($_POST["Zoeken"])) {
-        if (isset($_POST["keuze"])) {
-            $naamOfWoonplaats = $_POST['keuze'];
+        if (isset($_POST["combobox"])) {
+            $zoekenOp = $_POST['combobox'];
         }
         if (isset($_POST["zoekwaarde"])) {
             $naamZoeken = $_POST['zoekwaarde'];
         }
-        if (isset($_POST["keuze"])) {
+        if (isset($_POST["combobox"])) {
             if (isset($_POST["zoekwaarde"])) {
-                if ($naamOfWoonplaats == "Naam") {
+                if ($zoekenOp == "Naam") {
                     $klanten = $zoekenNaarObject->getklantByNaam($naamZoeken);
-                } elseif ($naamOfWoonplaats == "Woonplaats") {
+                    } elseif ($zoekenOp == "Achternaam") {
+                    $klanten = $zoekenNaarObject->getKlantByAchternaam($naamZoeken);
+                } elseif ($zoekenOp == "Woonplaats") {
                     $klanten = $zoekenNaarObject->getklantByPlaats($naamZoeken);
+                    
                 } else {
                     $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
                 }
-            } 
+            }
         }
     }
-                        ?>
+    ?>
     <?php
     if (!empty($klanten)): ?>
         <h2>Toegevoegde klanten</h2>
