@@ -3,7 +3,7 @@ include "../Src/Klanten.php";
 $klant = new Klanten();
 
 // Verbinden met database
-$conn = new mysqli("localhost", "root", "", "klusjesman");
+$conn = new mysqli("127.0.0.1", "root", "", "klusjesman");
 if ($conn->connect_error) {
     die("Verbindingsfout: " . $conn->connect_error);
 }
@@ -75,7 +75,7 @@ $totaal = 0;
 
         .column {
             flex: 1;
-            min-width: 300px;
+            min-width: 300px;   
         }
 
         table {

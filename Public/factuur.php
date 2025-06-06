@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $totaal = 0;
 ?>
-<form method="post">
+<for method="post">
 <table border="1" cellpadding="5" cellspacing="0">
     <tr>
         <th>Aantal</th>
