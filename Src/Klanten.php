@@ -19,10 +19,10 @@ class Klanten extends Database
         $params = [$id];
         return parent::voerQueryUit($query, $params)[0];
     }
-    public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats)
+    public function updateKlant($id, $voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats, $notities)
     {
-        $query = "UPDATE klanten SET klantnaam = ?, email = ?, telefoonnumer = ?, straat = ?, huisnummer = ?, postcode = ?, plaats = ? WHERE id = ?";
-        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats, $id];
+        $query = "UPDATE klanten SET voornaam = ?, tussenvoegsel = ?, achternaam = ?, email = ?, telefoonnummer = ?, straat = ?, huisnummer = ?, postcode = ?, plaats = ?, notities = ? WHERE id = ?";
+        $params = [$voornaam, $tussenvoegsel, $achternaam, $email, $telefoonnummer, $straat, $huisnummer, $postcode, $plaats, $notities, $id];
         return parent::voerQueryUit($query, $params);
     }
     
