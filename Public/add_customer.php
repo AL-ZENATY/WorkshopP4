@@ -3,7 +3,6 @@
 $klant_toegevoegd = false;
 
 require_once '../Config/db_config.php';
-
 try {
     // Verbinding maken
     $conn = new PDO("mysql:host=" . DB_HOSTNAME . ";dbname=" . DB_NAME . ";charset=utf8", DB_USERNAME, DB_PASSWORD);
@@ -37,7 +36,7 @@ try {
                         (voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats)
                         VALUES 
                         (:voornaam, :tussenvoegsel, :achternaam, :emailadres, :telefoonnummer, :straat, :huisnummer, :postcode, :plaats);";
-                
+
                 // Voorbereiden en uitvoeren van de query
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([
@@ -65,9 +64,19 @@ try {
     }
 
     // Klanten ophalen
-    $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
-
+    // $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+    // if (isset($_POST["zoeken"])) {
+    //     print_r($_POST);
+    //     $naamOfWoonplaats = $_POST['keuze'];
+    //     $naamZoeken = $_POST['zoekwaarde'];
+    //     if ($naamOfWoonplaats == "Naam") {
+    //         $klanten = $conn->getklantByNaam($naamZoeken);
+    //     } elseif ($naamOfWoonplaats == "Woonplaats") {
+    //         $klanten = $conn->getklantByPlaats($naamZoeken);
+    //     } else {
+    //         $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+    //     }
+    // }
 } catch (PDOException $e) {
     echo "Databasefout: " . $e->getMessage();
 }
-?>

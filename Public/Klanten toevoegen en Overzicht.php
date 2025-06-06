@@ -163,8 +163,50 @@
 
         <input type="submit" value="Klant toevoegen">
     </form>
-
-    <?php if (!empty($klanten)): ?>
+    <form method="POST">
+        <label for="Zoeken">Zoeken:</label>
+        <input type="radio" id="Naam" name="keuze" value="Naam" class="Naam"> Naam
+        <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats,<br>
+        <input type="text" name="zoekwaarde" placeholder="Naam/Woonplaats">
+        <input type="submit" value="Zoeken" name="Zoeken">
+        <input type="submit" value="Alles laten zien" name="Zoekenweg">
+    </form>
+    <?php
+    include "../Src/Klanten.php";
+    $zoekenNaarObject = new Klanten();
+    if (isset($_POST["Zoekenweg"])) {
+        if (isset($_POST["keuze"])) {
+            $_POST['keuze'] == "";
+            $naamOfWoonplaats = $_POST['keuze'];
+        }
+        if (isset($_POST["zoekwaarde"])) {
+            $_POST['zoekwaarde'] == "";
+            $naamZoeken = $_POST['zoekwaarde'];
+        }
+        $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+    }
+    if (isset($_POST["Zoeken"])) {
+        if (isset($_POST["keuze"])) {
+            $naamOfWoonplaats = $_POST['keuze'];
+        }
+        if (isset($_POST["zoekwaarde"])) {
+            $naamZoeken = $_POST['zoekwaarde'];
+        }
+        if (isset($_POST["keuze"])) {
+            if (isset($_POST["zoekwaarde"])) {
+                if ($naamOfWoonplaats == "Naam") {
+                    $klanten = $zoekenNaarObject->getklantByNaam($naamZoeken);
+                } elseif ($naamOfWoonplaats == "Woonplaats") {
+                    $klanten = $zoekenNaarObject->getklantByPlaats($naamZoeken);
+                } else {
+                    $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+                }
+            } 
+        }
+    }
+                        ?>
+    <?php
+    if (!empty($klanten)): ?>
         <h2>Toegevoegde klanten</h2>
         <table>
             <thead>
@@ -195,7 +237,8 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-    <?php endif; ?>
+    <?php endif;
+    ?>
 </body>
 
 </html>
