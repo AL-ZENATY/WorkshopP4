@@ -42,7 +42,7 @@
 
         input[type="text"],
         input[type="email"] {
-            width: 100%;
+            width: 97%;
             padding: 12px;
             margin-bottom: 16px;
             border: 1px solid #d1d5db;
@@ -159,9 +159,8 @@
             <input type="text" name="straat" placeholder="straat" required>
             <input type="text" name="huisnummer" placeholder="Huisnummer" required>
             <input type="text" name="postcode" placeholder="Postcode" required>
-            <input type="text" name="plaats" placeholder="Plaats" required>
+            <input type="text" name="plaats" placeholder="Plaats" required>      
         </div>
-
         <input type="submit" value="Klant toevoegen">
     </form>
     <form method="POST">
