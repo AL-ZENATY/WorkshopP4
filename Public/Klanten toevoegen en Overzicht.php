@@ -165,21 +165,17 @@
     </form>
     <form method="POST">
         <label for="Zoeken">Zoeken:</label>
-<<<<<<< HEAD
-        <input type="radio" id="Naam" name="keuze" value="Naam" class="Naam"> Naam
-        <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats,<br>
-        <input type="text" name="zoekwaarde" placeholder="Naam/Woonplaats">
-        <input type="submit" value="Zoeken" name="Zoeken"><br><br>
-=======
+
         <input list="options" id="combobox" name="combobox" placeholder="Zoeken op" />
         <datalist name="keuze" id="options">
             <option value="Naam">
             <option value="Achternaam">
             <option value="Woonplaats">
         </datalist>
+        <br><br>
         <input type="text" name="zoekwaarde" placeholder="Vul in">
         <input type="submit" value="Zoeken" name="Zoeken">
->>>>>>> 0c0577a4237ab1ffe2cf5426d8cdaad5b0d2595c
+        <br><br>
         <input type="submit" value="Alles laten zien" name="Zoekenweg">
     </form>
     <?php
