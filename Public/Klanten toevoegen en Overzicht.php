@@ -189,6 +189,7 @@
         }
         $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     if (isset($_POST["Zoeken"])) {
         if (isset($_POST["combobox"])) {
             $zoekenOp = $_POST['combobox'];
