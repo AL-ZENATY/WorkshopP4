@@ -32,4 +32,22 @@ class Klanten extends Database
         $params = [$id];
         return parent::voerQueryUit($query, $params) > 0;
     }
+    public function getklantByNaam($voornaam)
+    {
+        $query = "SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten WHERE Voornaam = ? ";
+        $params = [$voornaam];
+        return parent::voerQueryUit($query, $params);
+    }
+    public function getklantByAchternaam($achternaam)
+    {
+        $query = "SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten WHERE Achternaam = ? ";
+        $params = [$achternaam];
+        return parent::voerQueryUit($query, $params);
+    }
+    public function getklantByPlaats($plaats)
+    {
+        $query = "SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten WHERE Plaats = ? ";
+        $params = [$plaats];
+        return parent::voerQueryUit($query, $params);
+    }
 }
