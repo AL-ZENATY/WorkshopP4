@@ -158,7 +158,7 @@
             <input type="text" name="straat" placeholder="straat" required>
             <input type="text" name="huisnummer" placeholder="Huisnummer" required>
             <input type="text" name="postcode" placeholder="Postcode" required>
-            <input type="text" name="plaats" placeholder="Plaats" required>      
+            <input type="text" name="plaats" placeholder="Plaats" required>
         </div>
         <input type="submit" value="Klant toevoegen">
     </form>
@@ -167,7 +167,7 @@
         <input type="radio" id="Naam" name="keuze" value="Naam" class="Naam"> Naam
         <input type="radio" id="Woonplaats" name="keuze" value="Woonplaats" class="Woonplaats"> Woonplaats,<br>
         <input type="text" name="zoekwaarde" placeholder="Naam/Woonplaats">
-        <input type="submit" value="Zoeken" name="Zoeken">
+        <input type="submit" value="Zoeken" name="Zoeken"><br><br>
         <input type="submit" value="Alles laten zien" name="Zoekenweg">
     </form>
     <?php
@@ -200,10 +200,10 @@
                 } else {
                     $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
                 }
-            } 
+            }
         }
     }
-                        ?>
+    ?>
     <?php
     if (!empty($klanten)): ?>
         <h2>Toegevoegde klanten</h2>
