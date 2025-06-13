@@ -4,17 +4,14 @@ include "../Src/Factuur.php";
 $klant = new Klanten();
 $factuurObj = new Factuur();
 
-// Verbinden met database
 $conn = new mysqli("127.0.0.1", "root", "", "klusjesman");
 if ($conn->connect_error) {
     die("Verbindingsfout: " . $conn->connect_error);
 }
 
-// Ophalen klantgegevens
 $id = $_GET['id'];
 $huidig = $klant->getKlantById($id);
 
-// Notitie toevoegen
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notitie_inhoud'])) {
     $inhoud = $conn->real_escape_string($_POST['notitie_inhoud']);
     $conn->query("INSERT INTO klant_notities (klant_id, inhoud) VALUES ($id, '$inhoud')");
@@ -22,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notitie_inhoud'])) {
     exit;
 }
 
-// Notitie verwijderen
 if (isset($_GET['delete_note'])) {
     $note_id = intval($_GET['delete_note']);
     $conn->query("DELETE FROM klant_notities WHERE id = $note_id AND klant_id = $id");
@@ -30,24 +26,8 @@ if (isset($_GET['delete_note'])) {
     exit;
 }
 
-// Notities ophalen
 $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDER BY datum_toegevoegd DESC");
 
-// Materialenlijst
-$materialen = [
-    'Verf' => 15.00,
-    'Cement' => 12.50,
-    'Bakstenen' => 0.80,
-    'Hout' => 7.50,
-    'Tegels' => 2.00,
-    'Schroeven' => 0.10,
-    'Lijm' => 4.00,
-    'Isolatie' => 9.00,
-    'PVC-buis' => 3.50,
-    'Gipsplaat' => 6.00
-];
-
-// Factuurregels
 $regels = [
     ['aantal' => 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50],
     // Materiaalregel wordt hieronder dynamisch toegevoegd
@@ -133,40 +113,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             font-family: Arial, sans-serif;
             background-color: #f5f7fa;
             padding: 20px;
+            margin: 0;
         }
         h1 {
             font-size: 28px;
+            color: #333;
+        }
+        h2 {
             color: #333;
         }
         .flex-container {
             display: flex;
             gap: 40px;
             flex-wrap: wrap;
+            align-items: flex-start;
         }
         .column {
             flex: 1;
-            min-width: 300px;   
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
         }
-        table {
+        table.klantgegevens {
             width: 100%;
-            max-width: 900px;
+            max-width: 825px;
             background-color: white;
             border-collapse: collapse;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             margin-bottom: 20px;
+            flex-grow: 1;
         }
-        th, td {
-            padding: 14px;
+        table.klantgegevens th,
+        table.klantgegevens td {
+            padding: 10px;
+            text-align: left;
             border-bottom: 1px solid #ddd;
         }
-        th {
+        table.klantgegevens th {
             background-color: #4caf50;
             color: white;
         }
         textarea {
             width: 100%;
-            max-width: 875px;
+            max-width: 800px;
             min-height: 100px;
             padding: 10px;
             font-size: 16px;
@@ -188,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         .notitie {
             background: white;
             width: 100%;
-            max-width: 870px;
+            max-width: 790px;
             padding: 15px;
             border-left: 4px solid #4caf50;
             border-radius: 8px;
@@ -213,97 +203,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             color: #4caf50;
             text-decoration: underline;
         }
-        .bon-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            padding: 40px 40px 60px 40px;
-            margin-top: 30px;
-            max-width: 900px;
-            font-family: Arial, sans-serif;
-        }
-        .bon-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-        }
-        .bon-logo {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #bbb;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: #aaa;
-            font-weight: bold;
-            background-image: url('images.jpg');
-        }
-        .bon-title {
-            font-size: 48px;
-            font-weight: bold;
-            color: #444;
-            margin-bottom: 20px;
-        }
-        .bon-info-table {
+        table.factuur {
             width: 100%;
-            margin-bottom: 18px;
-        }
-        .bon-info-table th, .bon-info-table td {
-            text-align: left;
-            padding: 2px 8px 2px 0;
-            font-size: 15px;
-        }
-        .bon-info-table th {
-            font-weight: bold;
-            color: white;
-            width: 140px;
-        }
-        .bon-details-table {
-            width: 100%;
-            margin-bottom: 18px;
-        }
-        .bon-details-table th, .bon-details-table td {
-            text-align: left;
-            padding: 2px 8px 2px 0;
-            font-size: 15px;
-        }
-        .bon-details-table th {
-            font-weight: bold;
-            color: white;
-            width: 120px;
-        }
-        .bon-product-table {
-            width: 100%;
+            background-color: white;
             border-collapse: collapse;
-            margin-top: 18px;
-            margin-bottom: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            flex-grow: 1;
+            align-self: start;
         }
-        .bon-product-table th, .bon-product-table td {
-            border-bottom: 1px solid #eee;
-            padding: 10px 8px;
-            font-size: 16px;
+        table.factuur th,
+        table.factuur td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
-        .bon-product-table th {
-            background: #f5f7fa;
-            color: #222;
-            font-weight: bold;
+        table.factuur th {
+            background-color: #4caf50;
+            color: white;
         }
-        .bon-product-table tfoot td {
-            font-weight: bold;
-            background: #f5f7fa;
-        }
-        .bon-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            font-size: 14px;
-            color: #555;
-        }
-        .factuur-table input[type="number"] {
+        input[type="number"] {
             width: 60px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        @media screen and (max-width: 1024px) and (min-width: 600px) {
+            .flex-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .column {
+                max-width: 100%;
+            }
+            textarea,
+            .notitie,
+            table.klantgegevens,
+            table.factuur {
+                width: 100%;
+                max-width: 800px;
+            }
+            input[type="number"] {
+                width: 100%;
+            }
         }
     </style>
     <script>
@@ -349,28 +291,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
 </head>
 <body>
     <h1><?= htmlspecialchars($huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam']) ?></h1>
-    <h2>Gegevens</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <td><?= $huidig['Id'] ?></td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td><?= $huidig['Email'] ?></td>
-        </tr>
-        <tr>
-            <th>Telefoonnummer</th>
-            <td><?= $huidig['Telefoonnummer'] ?></td>
-        </tr>
-        <tr>
-            <th>Adres</th>
-            <td><?= $huidig['Straat'] . ' ' . $huidig['Huisnummer'] . ', ' . $huidig['Postcode'] . ' ' . $huidig['Plaats'] ?></td>
-        </tr>
-    </table>
 
     <div class="flex-container">
         <div class="column">
+            <h2>Gegevens</h2>
+            <table class="klantgegevens">
+                <tr><th>ID</th><td><?= $huidig['Id'] ?></td></tr>
+                <tr><th>Email</th><td><?= $huidig['Email'] ?></td></tr>
+                <tr><th>Telefoonnummer</th><td><?= $huidig['Telefoonnummer'] ?></td></tr>
+                <tr><th>Adres</th><td><?= $huidig['Straat'] . ' ' . $huidig['Huisnummer'] . ', ' . $huidig['Postcode'] . ' ' . $huidig['Plaats'] ?></td></tr>
+            </table>
+
             <h2>Notitie toevoegen</h2>
             <form method="post">
                 <textarea name="notitie_inhoud" required></textarea>
@@ -385,8 +316,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                         <p><?= nl2br(htmlspecialchars($note['inhoud'])) ?></p>
                         <div class="notitie-footer">
                             <small>Toegevoegd op: <?= $note['datum_toegevoegd'] ?></small>
-                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>"
-                                onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
+                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>" onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
                         </div>
                     </div>
                 <?php endwhile; ?>
@@ -396,47 +326,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         <div class="column">
             <h2>Factuur</h2>
             <form method="post">
-                <input type="hidden" id="hidden_aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>">
-                <input type="hidden" id="hidden_aantal_uur" name="aantal[2]" value="<?= htmlspecialchars($aantal_uur) ?>">
-                <table class="factuur-table">
+                <table class="factuur">
                     <tr>
                         <th>Aantal</th>
                         <th>Omschrijving</th>
                         <th>Prijs</th>
                         <th>Bedrag</th>
                     </tr>
-                    <tr>
-                        <td>
-                            <input type="number" min="0" id="aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>" />
-                        </td>
-                        <td><?= htmlspecialchars($regels[0]['omschrijving']) ?></td>
-                        <td id="prijs_rij" data-prijs="<?= $regels[0]['prijs'] ?>">€ <?= number_format($regels[0]['prijs'], 2, ',', '.') ?></td>
-                        <td id="bedrag_rij">€ <?= number_format($regels[0]['aantal'] * $regels[0]['prijs'], 2, ',', '.') ?></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="number" min="0" id="aantal_materiaal" name="aantal_materiaal" value="<?= htmlspecialchars($aantal_materiaal) ?>" />
-                        </td>
-                        <td>
-                            <select name="materiaal" id="materiaal" onchange="materiaalChange(this)">
-                                <?php foreach ($materialen as $naam => $prijs): ?>
-                                    <option value="<?= $naam ?>" <?= $gekozen_materiaal == $naam ? 'selected' : '' ?>>
-                                        <?= $naam ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                        <td id="prijs_materiaal" data-prijs="<?= $materiaal_prijs ?>">€ <?= number_format($materiaal_prijs, 2, ',', '.') ?></td>
-                        <td id="bedrag_materiaal">€ <?= number_format($regels[1]['aantal'] * $materiaal_prijs, 2, ',', '.') ?></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="number" min="0" id="aantal_uur" name="aantal[2]" value="<?= htmlspecialchars($aantal_uur) ?>" />
-                        </td>
-                        <td><?= htmlspecialchars($regels[2]['omschrijving']) ?></td>
-                        <td id="prijs_uur" data-prijs="<?= $regels[2]['prijs'] ?>">€ <?= number_format($regels[2]['prijs'], 2, ',', '.') ?></td>
-                        <td id="bedrag_uur">€ <?= number_format($regels[2]['aantal'] * $regels[2]['prijs'], 2, ',', '.') ?></td>
-                    </tr>
+                    <?php foreach ($regels as $i => $regel):
+                        $bedrag = $regel['aantal'] * $regel['prijs'];
+                        $totaal += $bedrag;
+                    ?>
+                        <tr>
+                            <td><input type="number" min="0" name="aantal[<?= $i ?>]" value="<?= htmlspecialchars($regel['aantal']) ?>" /></td>
+                            <td><?= htmlspecialchars($regel['omschrijving']) ?></td>
+                            <td>€ <?= number_format($regel['prijs'], 2, ',', '.') ?></td>
+                            <td>€ <?= number_format($bedrag, 2, ',', '.') ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php
+                    $btw = $totaal * 0.21;
+                    $incl = $totaal + $btw;
+                    ?>
                     <tr>
                         <td colspan="3" style="text-align:right;"><strong>Subtotaal</strong></td>
                         <td id="subtotaal"><strong>€ 0,00</strong></td>
