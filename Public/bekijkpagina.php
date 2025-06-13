@@ -369,15 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         </tr>
     </table>
 
-    <div class="flex-container">
-        <div class="column">
-            <h2>Gegevens</h2>
-            <table class="klantgegevens">
-                <tr><th>ID</th><td><?= $huidig['Id'] ?></td></tr>
-                <tr><th>Email</th><td><?= $huidig['Email'] ?></td></tr>
-                <tr><th>Telefoonnummer</th><td><?= $huidig['Telefoonnummer'] ?></td></tr>
-                <tr><th>Adres</th><td><?= $huidig['Straat'] . ' ' . $huidig['Huisnummer'] . ', ' . $huidig['Postcode'] . ' ' . $huidig['Plaats'] ?></td></tr>
-            </table>
+
 
             <h2>Notitie toevoegen</h2>
             <form method="post">
