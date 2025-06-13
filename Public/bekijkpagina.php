@@ -4,17 +4,14 @@ include "../Src/Factuur.php";
 $klant = new Klanten();
 $factuurObj = new Factuur();
 
-// Verbinden met database
 $conn = new mysqli("127.0.0.1", "root", "", "klusjesman");
 if ($conn->connect_error) {
     die("Verbindingsfout: " . $conn->connect_error);
 }
 
-// Ophalen klantgegevens
 $id = $_GET['id'];
 $huidig = $klant->getKlantById($id);
 
-// Notitie toevoegen
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notitie_inhoud'])) {
     $inhoud = $conn->real_escape_string($_POST['notitie_inhoud']);
     $conn->query("INSERT INTO klant_notities (klant_id, inhoud) VALUES ($id, '$inhoud')");
@@ -22,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notitie_inhoud'])) {
     exit;
 }
 
-// Notitie verwijderen
 if (isset($_GET['delete_note'])) {
     $note_id = intval($_GET['delete_note']);
     $conn->query("DELETE FROM klant_notities WHERE id = $note_id AND klant_id = $id");
@@ -30,7 +26,6 @@ if (isset($_GET['delete_note'])) {
     exit;
 }
 
-// Notities ophalen
 $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDER BY datum_toegevoegd DESC");
 
 // Materialenlijst
@@ -133,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             font-family: Arial, sans-serif;
             background-color: #f5f7fa;
             padding: 20px;
+            margin: 0;
         }
         h1 {
             font-size: 28px;
@@ -142,19 +138,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             display: flex;
             gap: 40px;
             flex-wrap: wrap;
+            align-items: flex-start;
         }
         .column {
             flex: 1;
-            min-width: 300px;   
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
         }
         table {
             width: 100%;
-            max-width: 900px;
+            max-width: 825px;
             background-color: white;
             border-collapse: collapse;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             margin-bottom: 20px;
+            flex-grow: 1;
         }
         th, td {
             padding: 14px;
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         }
         textarea {
             width: 100%;
-            max-width: 875px;
+            max-width: 800px;
             min-height: 100px;
             padding: 10px;
             font-size: 16px;
@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         .notitie {
             background: white;
             width: 100%;
-            max-width: 870px;
+            max-width: 790px;
             padding: 15px;
             border-left: 4px solid #4caf50;
             border-radius: 8px;
@@ -369,8 +369,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         </tr>
     </table>
 
-    <div class="flex-container">
-        <div class="column">
+
+
             <h2>Notitie toevoegen</h2>
             <form method="post">
                 <textarea name="notitie_inhoud" required></textarea>
@@ -385,8 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                         <p><?= nl2br(htmlspecialchars($note['inhoud'])) ?></p>
                         <div class="notitie-footer">
                             <small>Toegevoegd op: <?= $note['datum_toegevoegd'] ?></small>
-                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>"
-                                onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
+                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>" onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
                         </div>
                     </div>
                 <?php endwhile; ?>
