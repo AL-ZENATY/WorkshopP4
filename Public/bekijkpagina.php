@@ -33,7 +33,6 @@ if (isset($_GET['delete_note'])) {
 // Notities ophalen
 $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDER BY datum_toegevoegd DESC");
 
-<<<<<<< HEAD
 // Materialenlijst
 $materialen = [
     'Verf' => 15.00,
@@ -49,8 +48,6 @@ $materialen = [
 ];
 
 // Factuurregels
-=======
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
 $regels = [
     ['aantal' => 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50],
     // Materiaalregel wordt hieronder dynamisch toegevoegd
@@ -141,12 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             font-size: 28px;
             color: #333;
         }
-<<<<<<< HEAD
-=======
-        h2 {
-            color: #333;
-        }
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
         .flex-container {
             display: flex;
             gap: 40px;
@@ -156,11 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             flex: 1;
             min-width: 300px;   
         }
-<<<<<<< HEAD
         table {
-=======
-        table.klantgegevens {
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
             width: 100%;
             max-width: 900px;
             background-color: white;
@@ -169,21 +156,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             border-radius: 12px;
             margin-bottom: 20px;
         }
-<<<<<<< HEAD
         th, td {
             padding: 14px;
             border-bottom: 1px solid #ddd;
         }
         th {
-=======
-        table.klantgegevens th,
-        table.klantgegevens td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        table.klantgegevens th {
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
             background-color: #4caf50;
             color: white;
         }
@@ -236,7 +213,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             color: #4caf50;
             text-decoration: underline;
         }
-<<<<<<< HEAD
         .bon-container {
             background: #fff;
             border-radius: 12px;
@@ -328,51 +304,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         }
         .factuur-table input[type="number"] {
             width: 60px;
-=======
-        table.factuur {
-            width: 100%;
-            background-color: white;
-            border-collapse: collapse;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            flex-grow: 1;
-            align-self: start;
-        }
-        table.factuur th,
-        table.factuur td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        table.factuur th {
-            background-color: #4caf50;
-            color: white;
-        }
-        input[type="number"] {
-            width: 60px;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        @media screen and (max-width: 1024px) and (min-width: 600px) {
-            .flex-container {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .column {
-                max-width: 100%;
-            }
-            textarea,
-            .notitie,
-            table.klantgegevens,
-            table.factuur {
-                width: 100%;
-                max-width: 800px;
-            }
-            input[type="number"] {
-                width: 100%;
-            }
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
         }
     </style>
     <script>
@@ -418,7 +349,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
 </head>
 <body>
     <h1><?= htmlspecialchars($huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam']) ?></h1>
-<<<<<<< HEAD
     <h2>Gegevens</h2>
     <table>
         <tr>
@@ -438,8 +368,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             <td><?= $huidig['Straat'] . ' ' . $huidig['Huisnummer'] . ', ' . $huidig['Postcode'] . ' ' . $huidig['Plaats'] ?></td>
         </tr>
     </table>
-=======
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
 
     <div class="flex-container">
         <div class="column">
@@ -468,20 +396,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         <div class="column">
             <h2>Factuur</h2>
             <form method="post">
-<<<<<<< HEAD
                 <input type="hidden" id="hidden_aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>">
                 <input type="hidden" id="hidden_aantal_uur" name="aantal[2]" value="<?= htmlspecialchars($aantal_uur) ?>">
                 <table class="factuur-table">
-=======
-                <table class="factuur">
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
                     <tr>
                         <th>Aantal</th>
                         <th>Omschrijving</th>
                         <th>Prijs</th>
                         <th>Bedrag</th>
                     </tr>
-<<<<<<< HEAD
                     <tr>
                         <td>
                             <input type="number" min="0" id="aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>" />
@@ -514,23 +437,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                         <td id="prijs_uur" data-prijs="<?= $regels[2]['prijs'] ?>">€ <?= number_format($regels[2]['prijs'], 2, ',', '.') ?></td>
                         <td id="bedrag_uur">€ <?= number_format($regels[2]['aantal'] * $regels[2]['prijs'], 2, ',', '.') ?></td>
                     </tr>
-=======
-                    <?php foreach ($regels as $i => $regel):
-                        $bedrag = $regel['aantal'] * $regel['prijs'];
-                        $totaal += $bedrag;
-                    ?>
-                        <tr>
-                            <td><input type="number" min="0" name="aantal[<?= $i ?>]" value="<?= htmlspecialchars($regel['aantal']) ?>" /></td>
-                            <td><?= htmlspecialchars($regel['omschrijving']) ?></td>
-                            <td>€ <?= number_format($regel['prijs'], 2, ',', '.') ?></td>
-                            <td>€ <?= number_format($bedrag, 2, ',', '.') ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <?php
-                    $btw = $totaal * 0.21;
-                    $incl = $totaal + $btw;
-                    ?>
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
                     <tr>
                         <td colspan="3" style="text-align:right;"><strong>Subtotaal</strong></td>
                         <td id="subtotaal"><strong>€ 0,00</strong></td>
@@ -648,8 +554,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
 
     <p><a href="klanten toevoegen en Overzicht.php">← Terug naar overzicht pagina</a></p>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> e78a5cf4e454af151650f702471d566a786a3a67
