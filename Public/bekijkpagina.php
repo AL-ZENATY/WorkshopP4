@@ -180,7 +180,8 @@ $totaal = 0;
             .notitie,
             table.klantgegevens,
             table.factuur {
-                max-width: 100%;
+                width: 100%;
+                max-width: 800px;
             }
             input[type="number"] {
                 width: 100%;
