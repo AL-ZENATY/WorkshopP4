@@ -1,52 +1,56 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gegevens Pagina</title>
+    <?php include "../Public/add_customer.php"; ?>
     <style>
-        /* Basis styling */
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f7fa;
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
-        h1 {
-            text-align: center;
+
+        h1,
+        h2 {
             color: #333;
         }
+
         form {
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 24px;
-            width: 100%; /* Zorgt ervoor dat het formulier 100% breed is van zijn container */
-            max-width: 900px; /* Maximaal 900px breed, verhoog dit voor grotere schermen */
-            box-sizing: border-box;
+            max-width: 900px;
+            width: 90%;
+            margin-top: 24px;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
             color: #555;
             font-weight: bold;
         }
+
         input[type="text"],
         input[type="email"] {
-            width: 100%;
+            width: 97%;
             padding: 12px;
             margin-bottom: 16px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
-            box-sizing: border-box;
             font-size: 16px;
         }
+
         input[type="submit"] {
-            display: block;
             width: 100%;
             padding: 14px;
             background-color: rgb(70, 229, 112);
@@ -55,80 +59,197 @@
             border-radius: 8px;
             font-size: 18px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
+
+
         input[type="submit"]:hover {
             background-color: rgb(56, 180, 89);
         }
 
-        /* Tablet-specifieke styling */
-        @media (min-width: 768px) and (max-width: 1024px) {
-            form {
-                width: 90%; /* Maak het formulier breder op tablets */
-                max-width: 950px; /* Kan groter zijn dan 900px, hier naar 950px */
-                padding: 32px;
-            }
-            label {
-                margin-top: 12px;
-            }
-            input[type="text"],
-            input[type="email"] {
-                width: 100%; /* Veldbreedte op 100% */
-            }
-            input[type="submit"] {
-                grid-column: 1 / -1;
-                max-width: 80%;
-                justify-self: center;
-                margin-top: 16px;
-            }
+        .adres-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
-        /* Desktop-specifieke styling (extra breed voor grotere schermen) */
-        @media (min-width: 1025px) {
-            form {
-                max-width: 1100px; /* Nog breder formulier op desktop */
-                width: 100%; /* Zorgt ervoor dat de breedte 100% is van zijn container */
-            }
+        .adres-container input {
+            flex: 1 1 200px;
+            min-width: 120px;
+        }
+
+        table {
+            margin: 32px auto;
+            border-collapse: collapse;
+            width: 95%;
+            max-width: 1100px;
+            background-color: #ffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        .success-msg {
+            color: green;
+            font-weight: bold;
+            margin-top: 16px;
+        }
+
+        a {
+            color: black;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #4caf50;
         }
     </style>
     <script>
-        // JavaScript om telefoonnummer te formatteren naar 6 28 696 475
         function formatPhoneNumber(input) {
-            let phone = input.value.replace(/\D/g, ''); // Verwijder alles behalve cijfers
+            let phone = input.value.replace(/\D/g, '');
             if (phone.length > 1) {
-                phone = phone.substring(0, 1) + ' ' + phone.substring(1, 3) + ' ' + phone.substring(3, 6) + ' ' + phone.substring(6, 9);
-            } else if (phone.length > 3) {
                 phone = phone.substring(0, 1) + ' ' + phone.substring(1, 3) + ' ' + phone.substring(3, 6) + ' ' + phone.substring(6, 9);
             }
             input.value = phone;
         }
     </script>
 </head>
+
 <body>
-    <div>
-        <h1>Overzicht Pagina</h1>
-        <form method="post" action="add_customer.php">
-            <div>
-                <label for="voornaam">Voornaam:</label>
-                <input type="text" id="voornaam" name="voornaam" placeholder="Voer je voornaam in" required>
+    <h1>Overzicht Pagina</h1>
 
-                <label for="tussenvoegsel">Tussenvoegsel:</label>
-                <input type="text" id="tussenvoegsel" name="tussenvoegsel" placeholder="Tussenvoegsel (optioneel)">
+    <?php if ($klant_toegevoegd): ?>
+        <p class="success-msg">✅ Klant succesvol toegevoegd!</p>
+    <?php endif; ?>
 
-                <label for="achternaam">Achternaam:</label>
-                <input type="text" id="achternaam" name="achternaam" placeholder="Voer je achternaam in" required>
+    <form method="post">
+        <label for="voornaam">Voornaam:</label>
+        <input type="text" id="voornaam" name="voornaam" required>
 
-                <label for="emailadres">Emailadres:</label>
-                <input type="email" id="emailadres" name="emailadres" placeholder="Voer je emailadres in" required>
+        <label for="tussenvoegsel">Tussenvoegsel:</label>
+        <input type="text" id="tussenvoegsel" name="tussenvoegsel">
 
-                <label for="telefoonnummer">Telefoonnummer:</label>
-                <input type="text" id="telefoonnummer" name="telefoonnummer" placeholder="1 23 456 789" oninput="formatPhoneNumber(this)" required>
+        <label for="achternaam">Achternaam:</label>
+        <input type="text" id="achternaam" name="achternaam" required>
 
-                <label for="adres">Adres:</label>
-                <input type="text" id="adres" name="adres" placeholder="Voer je adres in" required>
-            </div>
-            <input type="submit" value="Klant toevoegen">
-        </form>
-    </div>
+        <label for="emailadres">Emailadres:</label>
+        <input type="email" id="emailadres" name="emailadres" required>
+
+        <label for="telefoonnummer">Telefoonnummer:</label>
+        <input type="text" id="telefoonnummer" name="telefoonnummer" oninput="formatPhoneNumber(this)" required>
+
+        <label>Adres:</label>
+        <div class="adres-container">
+            <input type="text" name="straat" placeholder="straat" required>
+            <input type="text" name="huisnummer" placeholder="Huisnummer" required>
+            <input type="text" name="postcode" placeholder="Postcode" required>
+            <input type="text" name="plaats" placeholder="Plaats" required>
+        </div>
+        <input type="submit" value="Klant toevoegen">
+    </form>
+    <form method="POST">
+        <label for="Zoeken">Zoeken:</label>
+
+        <input list="options" id="combobox" name="combobox" placeholder="Zoeken op" />
+        <datalist name="keuze" id="options">
+            <option value="Naam">
+            <option value="Achternaam">
+            <option value="Woonplaats">
+        </datalist>
+        <br><br>
+        <input type="text" name="zoekwaarde" placeholder="Vul in">
+        <input type="submit" value="Zoeken" name="Zoeken">
+        <br><br>
+        <input type="submit" value="Alles laten zien" name="Zoekenweg">
+    </form>
+    <?php
+    include "../Src/Klanten.php";
+    $zoekenNaarObject = new Klanten();
+    if (isset($_POST["Zoekenweg"])) {
+        if (isset($_POST["combobox"])) {
+            $_POST['combobox'] == "";
+            $zoekenOp = $_POST['combobox'];
+        }
+        if (isset($_POST["zoekwaarde"])) {
+            $_POST['zoekwaarde'] == "";
+            $naamZoeken = $_POST['zoekwaarde'];
+        }
+        $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    if (isset($_POST["Zoeken"])) {
+        if (isset($_POST["combobox"])) {
+            $zoekenOp = $_POST['combobox'];
+        }
+        if (isset($_POST["zoekwaarde"])) {
+            $naamZoeken = $_POST['zoekwaarde'];
+        }
+        if (isset($_POST["combobox"])) {
+            if (isset($_POST["zoekwaarde"])) {
+                if ($zoekenOp == "Naam") {
+                    $klanten = $zoekenNaarObject->getklantByNaam($naamZoeken);
+                    } elseif ($zoekenOp == "Achternaam") {
+                    $klanten = $zoekenNaarObject->getKlantByAchternaam($naamZoeken);
+                } elseif ($zoekenOp == "Woonplaats") {
+                    $klanten = $zoekenNaarObject->getklantByPlaats($naamZoeken);
+                    
+                } else {
+                    $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+                }
+            }
+        }
+    }
+    ?>
+    <?php
+    if (!empty($klanten)): ?>
+        <h2>Toegevoegde klanten</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Voornaam</th>
+                    <th>Tussenvoegsel</th>
+                    <th>Achternaam</th>
+                    <th>Email</th>
+                    <th>Telefoonnummer</th>
+                    <th>Adres</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($klanten as $klant): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($klant['id']) ?></td>
+                        <td><?= htmlspecialchars($klant['voornaam']) ?></td>
+                        <td><?= htmlspecialchars($klant['tussenvoegsel']) ?></td>
+                        <td><?= htmlspecialchars($klant['achternaam']) ?></td>
+                        <td><?= htmlspecialchars($klant['email']) ?></td>
+                        <td><?= htmlspecialchars($klant['telefoonnummer']) ?></td>
+                        <td><?= htmlspecialchars($klant['straat'] . ' ' . $klant['huisnummer'] . ', ' . $klant['postcode'] . ' ' . $klant['plaats']) ?>
+                        </td>
+                        <td><a href="bekijkpagina.php?id=<?php echo urlencode($klant['id']); ?>">Meer</a></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif;
+    ?>
 </body>
+
 </html>
