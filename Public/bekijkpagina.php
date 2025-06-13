@@ -29,6 +29,7 @@ if (isset($_GET['delete_note'])) {
 $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDER BY datum_toegevoegd DESC");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Materialenlijst
 $materialen = [
     'Verf' => 15.00,
@@ -46,6 +47,8 @@ $materialen = [
 // Factuurregels
 =======
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
 $regels = [
     ['aantal' => 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50],
     // Materiaalregel wordt hieronder dynamisch toegevoegd
@@ -138,11 +141,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             color: #333;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         h2 {
             color: #333;
         }
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+        h2 {
+            color: #333;
+        }
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
         .flex-container {
             display: flex;
             gap: 40px;
@@ -156,10 +165,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             flex-direction: column;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         table {
 =======
         table.klantgegevens {
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+        table.klantgegevens {
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
             width: 100%;
             max-width: 825px;
             background-color: white;
@@ -170,12 +183,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             flex-grow: 1;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         th, td {
             padding: 14px;
             border-bottom: 1px solid #ddd;
         }
         th {
 =======
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
         table.klantgegevens th,
         table.klantgegevens td {
             padding: 10px;
@@ -183,7 +199,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             border-bottom: 1px solid #ddd;
         }
         table.klantgegevens th {
+<<<<<<< HEAD
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
             background-color: #4caf50;
             color: white;
         }
@@ -236,6 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             color: #4caf50;
             text-decoration: underline;
         }
+<<<<<<< HEAD
 <<<<<<< HEAD
         .bon-container {
             background: #fff;
@@ -393,6 +413,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         </tr>
     </table>
 =======
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
         table.factuur {
             width: 100%;
             background-color: white;
@@ -438,10 +460,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             }
         }
     </style>
+    <script>
+        // Live prijsberekening in de factuur
+        function updateFactuur() {
+            // Rij kosten
+            let rijAantal = parseFloat(document.getElementById('aantal_rij').value) || 0;
+            let rijPrijs = parseFloat(document.getElementById('prijs_rij').dataset.prijs);
+            document.getElementById('bedrag_rij').innerText = "€ " + (rijAantal * rijPrijs).toFixed(2).replace('.', ',');
+
+            // Materiaal
+            let matAantal = parseFloat(document.getElementById('aantal_materiaal').value) || 0;
+            let matPrijs = parseFloat(document.getElementById('prijs_materiaal').dataset.prijs);
+            document.getElementById('bedrag_materiaal').innerText = "€ " + (matAantal * matPrijs).toFixed(2).replace('.', ',');
+
+            // Uurloon
+            let uurAantal = parseFloat(document.getElementById('aantal_uur').value) || 0;
+            let uurPrijs = parseFloat(document.getElementById('prijs_uur').dataset.prijs);
+            document.getElementById('bedrag_uur').innerText = "€ " + (uurAantal * uurPrijs).toFixed(2).replace('.', ',');
+
+            // Totaal
+            let subtotaal = (rijAantal * rijPrijs) + (matAantal * matPrijs) + (uurAantal * uurPrijs);
+            let btw = subtotaal * 0.21;
+            let incl = subtotaal + btw;
+            document.getElementById('subtotaal').innerText = "€ " + subtotaal.toFixed(2).replace('.', ',');
+            document.getElementById('btw').innerText = "€ " + btw.toFixed(2).replace('.', ',');
+            document.getElementById('incl').innerText = "€ " + incl.toFixed(2).replace('.', ',');
+        }
+        window.addEventListener('DOMContentLoaded', function() {
+            updateFactuur();
+            document.querySelectorAll('.factuur-table input, .factuur-table select').forEach(function(el) {
+                el.addEventListener('input', updateFactuur);
+                el.addEventListener('change', updateFactuur);
+            });
+        });
+        // Voorkom resetten van andere aantallen bij materiaalkeuze
+        function materiaalChange(sel) {
+            document.getElementById('hidden_aantal_rij').value = document.getElementById('aantal_rij').value;
+            document.getElementById('hidden_aantal_uur').value = document.getElementById('aantal_uur').value;
+            sel.form.submit();
+        }
+    </script>
 </head>
 <body>
     <h1><?= htmlspecialchars($huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam']) ?></h1>
+<<<<<<< HEAD
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
 
     <div class="flex-container">
         <div class="column">
@@ -478,18 +543,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             <h2>Factuur</h2>
             <form method="post">
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <input type="hidden" id="hidden_aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>">
                 <input type="hidden" id="hidden_aantal_uur" name="aantal[2]" value="<?= htmlspecialchars($aantal_uur) ?>">
                 <table class="factuur-table">
 =======
                 <table class="factuur">
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+                <table class="factuur">
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
                     <tr>
                         <th>Aantal</th>
                         <th>Omschrijving</th>
                         <th>Prijs</th>
                         <th>Bedrag</th>
                     </tr>
+<<<<<<< HEAD
 <<<<<<< HEAD
                     <tr>
                         <td>
@@ -524,6 +594,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                         <td id="bedrag_uur">€ <?= number_format($regels[2]['aantal'] * $regels[2]['prijs'], 2, ',', '.') ?></td>
                     </tr>
 =======
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
                     <?php foreach ($regels as $i => $regel):
                         $bedrag = $regel['aantal'] * $regel['prijs'];
                         $totaal += $bedrag;
@@ -539,7 +611,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                     $btw = $totaal * 0.21;
                     $incl = $totaal + $btw;
                     ?>
+<<<<<<< HEAD
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
                     <tr>
                         <td colspan="3" style="text-align:right;"><strong>Subtotaal</strong></td>
                         <td id="subtotaal"><strong>€ 0,00</strong></td>
@@ -658,7 +733,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
     <p><a href="klanten toevoegen en Overzicht.php">← Terug naar overzicht pagina</a></p>
 </body>
 <<<<<<< HEAD
+<<<<<<< HEAD
 </html>
 =======
 </html>
 >>>>>>> 2248809852e28d4c109e70a230a1cbe116ffe720
+=======
+</html>
+>>>>>>> 7372bf5aff1818cd31002d3dd532f1f647d3d34f
