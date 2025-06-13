@@ -165,50 +165,29 @@
     </form>
     <form method="POST">
         <label for="Zoeken">Zoeken:</label>
-
-        <input list="options" id="combobox" name="combobox" placeholder="Zoeken op" />
-        <datalist name="keuze" id="options">
-            <option value="Naam">
-            <option value="Achternaam">
-            <option value="Woonplaats">
-        </datalist>
-        <br><br>
-        <input type="text" name="zoekwaarde" placeholder="Vul in">
-        <input type="submit" value="Zoeken" name="Zoeken">
-        <br><br>
-        <input type="submit" value="Alles laten zien" name="Zoekenweg">
+        <input type="text" name="ZoekenOpAchternaam" placeholder="Zoeken op achternaam: ">
+        <input type="text" name="ZoekenOpWoonplaats" placeholder="Zoeken op woonplaats: ">
+        <input type="submit" value="Zoeken" name="Zoekenen">
     </form>
     <?php
     include "../Src/Klanten.php";
     $zoekenNaarObject = new Klanten();
-    if (isset($_POST["Zoekenweg"])) {
-        if (isset($_POST["combobox"])) {
-            $_POST['combobox'] == "";
-            $zoekenOp = $_POST['combobox'];
+    if(isset($_POST["Zoekenen"]))
+        {
+        if (isset($_POST["ZoekenOpAchternaam"])) {
+            $ZoekenOpAchternaam = $_POST['ZoekenOpAchternaam'];
         }
-        if (isset($_POST["zoekwaarde"])) {
-            $_POST['zoekwaarde'] == "";
-            $naamZoeken = $_POST['zoekwaarde'];
+        if (isset($_POST["ZoekenOpWoonplaats"])) {
+            $ZoekenOpWoonplaats = $_POST['ZoekenOpWoonplaats'];
         }
-        $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    if (isset($_POST["Zoeken"])) {
-        if (isset($_POST["combobox"])) {
-            $zoekenOp = $_POST['combobox'];
-        }
-        if (isset($_POST["zoekwaarde"])) {
-            $naamZoeken = $_POST['zoekwaarde'];
-        }
-        if (isset($_POST["combobox"])) {
-            if (isset($_POST["zoekwaarde"])) {
-                if ($zoekenOp == "Naam") {
-                    $klanten = $zoekenNaarObject->getklantByNaam($naamZoeken);
-                    } elseif ($zoekenOp == "Achternaam") {
-                    $klanten = $zoekenNaarObject->getKlantByAchternaam($naamZoeken);
-                } elseif ($zoekenOp == "Woonplaats") {
-                    $klanten = $zoekenNaarObject->getklantByPlaats($naamZoeken);
-                    
+        if (isset($_POST["Zoekenen"])) {
+            {
+                if ($ZoekenOpAchternaam ==! "" && $ZoekenOpWoonplaats ==! "") {
+                    $klanten = $zoekenNaarObject->getKlantByAchternaamEnWoonplaats($ZoekenOpAchternaam, $ZoekenOpWoonplaats);
+                } elseif ($ZoekenOpAchternaam ==! "") {
+                    $klanten = $zoekenNaarObject->getklantByAchternaam($ZoekenOpAchternaam);
+                } elseif ($ZoekenOpWoonplaats ==! "") {
+                    $klanten = $zoekenNaarObject->getklantByPlaats($ZoekenOpWoonplaats);
                 } else {
                     $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
                 }
