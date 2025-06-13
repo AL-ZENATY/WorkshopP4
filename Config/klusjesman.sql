@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Gegenereerd op: 20 mei 2025 om 11:24
+-- Gegenereerd op: 10 jun 2025 om 11:30
 -- Serverversie: 5.7.17
 -- PHP-versie: 8.2.16
 
@@ -22,6 +22,22 @@ SET time_zone = "+00:00";
 --
 CREATE DATABASE IF NOT EXISTS `klusjesman` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
 USE `klusjesman`;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `factuur`
+--
+
+CREATE TABLE `factuur` (
+  `id` int(11) NOT NULL,
+  `materiaal` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `prijs` decimal(10,0) NOT NULL,
+  `aantal` int(11) NOT NULL,
+  `beschrijving` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `datum` date NOT NULL,
+  `bedrag` decimal(10,0) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -53,21 +69,54 @@ CREATE TABLE `klanten` (
   `Straat` varchar(30) COLLATE utf8_bin NOT NULL,
   `Huisnummer` varchar(10) COLLATE utf8_bin NOT NULL,
   `Postcode` varchar(20) COLLATE utf8_bin NOT NULL,
-  `Plaats` varchar(20) COLLATE utf8_bin NOT NULL,
-  `Notities` varchar(1000) COLLATE utf8_bin NOT NULL
+  `Plaats` varchar(20) COLLATE utf8_bin NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `klanten`
 --
 
-INSERT INTO `klanten` (`Id`, `Voornaam`, `Tussenvoegsel`, `Achternaam`, `Email`, `Telefoonnummer`, `Straat`, `Huisnummer`, `Postcode`, `Plaats`, `Notities`) VALUES
-(1, 'Johan', '', 'Derksen', 'JohanDerksen@gmail.com', '0634253456', 'Jurgenslaan', '83', '8435KD', 'Doetinchem', ''),
-(5, 'Bart', '', 'Titus', 'BartTitus@gmail.com', '0 34 637 474', 'Jurgenslaan', '83a', '9346TD', 'Doetinchem', '');
+INSERT INTO `klanten` (`Id`, `Voornaam`, `Tussenvoegsel`, `Achternaam`, `Email`, `Telefoonnummer`, `Straat`, `Huisnummer`, `Postcode`, `Plaats`) VALUES
+(10, 'Abd-AL-Rahman', '', 'Zenaty', 'Abood.Zy@gmail.com', '7 54 696 826', 'Tuinstraat', '9', '0000 Zy', 'Lemelerveld'),
+(9, 'Abdulla', '', 'Zenaty', '0.abd.zy.0@gmail.com', '6 28 696 475', 'Bergherveld', '50', '7041 XT', '\'s-Heerenberg'),
+(11, 'Henk', 'Van', 'Johan', 'HenkVanJohan@gmail.com', '3 02 692 626', 'kfaieatadsggae', '12', '3623da', 'adalje'),
+(12, 'milan', '', 'hoegen', 'hoegen.milan@gmail.com', '2 04 652 624', 'hoflaan', '20', '1835KD', 'Terborg'),
+(13, 'Johan', 'Van', 'Derksen', 'JohanVanDerksen@gmail.com', '0 23 553 392', 'hoflaan', '62', '8384KD', 'Terborg'),
+(14, 'Jay', '', 'K', 'JayK@gmail.com', '2 35 203 296', 'Kattenstraat', '78a', '8800RS', 'Roeselare');
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `klant_notities`
+--
+
+CREATE TABLE `klant_notities` (
+  `id` int(11) NOT NULL,
+  `klant_id` int(11) NOT NULL,
+  `inhoud` text COLLATE utf8_bin NOT NULL,
+  `datum_toegevoegd` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `klant_notities`
+--
+
+INSERT INTO `klant_notities` (`id`, `klant_id`, `inhoud`, `datum_toegevoegd`) VALUES
+(10, 9, 'Test', '2025-05-23 10:54:05'),
+(11, 9, 'Test2', '2025-05-23 10:55:15'),
+(22, 14, 'Fiets', '2025-06-06 11:30:14'),
+(18, 11, 'Fiets', '2025-05-28 09:26:25'),
+(21, 10, 'Fiets', '2025-06-06 10:27:56');
 
 --
 -- Indexen voor geëxporteerde tabellen
 --
+
+--
+-- Indexen voor tabel `factuur`
+--
+ALTER TABLE `factuur`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexen voor tabel `klanten`
@@ -76,14 +125,33 @@ ALTER TABLE `klanten`
   ADD PRIMARY KEY (`Id`);
 
 --
+-- Indexen voor tabel `klant_notities`
+--
+ALTER TABLE `klant_notities`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `klant_id` (`klant_id`);
+
+--
 -- AUTO_INCREMENT voor geëxporteerde tabellen
 --
+
+--
+-- AUTO_INCREMENT voor een tabel `factuur`
+--
+ALTER TABLE `factuur`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT voor een tabel `klanten`
 --
 ALTER TABLE `klanten`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT voor een tabel `klant_notities`
+--
+ALTER TABLE `klant_notities`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

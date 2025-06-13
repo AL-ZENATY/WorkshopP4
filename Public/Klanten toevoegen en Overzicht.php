@@ -159,20 +159,23 @@
             <input type="text" name="straat" placeholder="straat" required>
             <input type="text" name="huisnummer" placeholder="Huisnummer" required>
             <input type="text" name="postcode" placeholder="Postcode" required>
-            <input type="text" name="plaats" placeholder="Plaats" required>      
+            <input type="text" name="plaats" placeholder="Plaats" required>
         </div>
         <input type="submit" value="Klant toevoegen">
     </form>
     <form method="POST">
         <label for="Zoeken">Zoeken:</label>
+
         <input list="options" id="combobox" name="combobox" placeholder="Zoeken op" />
         <datalist name="keuze" id="options">
             <option value="Naam">
             <option value="Achternaam">
             <option value="Woonplaats">
         </datalist>
+        <br><br>
         <input type="text" name="zoekwaarde" placeholder="Vul in">
         <input type="submit" value="Zoeken" name="Zoeken">
+        <br><br>
         <input type="submit" value="Alles laten zien" name="Zoekenweg">
     </form>
     <?php
