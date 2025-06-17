@@ -12,14 +12,21 @@ class Factuur extends Database
     {
         $query = "SELECT * FROM factuur WHERE id = ?";
         $params = [$id];
-        return parent::voerQueryUit($query, $params)[0];
+        $result = parent::voerQueryUit($query, $params);
+        return isset($result[0]) ? $result[0] : null;
     }
 
     public function updateFactuur($id, $klantId, $datum, $bedrag)
     {
-        $query = "UPDATE factuur SET id = ?, datum = ?, bedrag = ? WHERE id = ?";
+        // Probeer eerst te updaten, als er geen rijen zijn, doe een insert
+        $query = "UPDATE factuur SET klant_id = ?, datum = ?, bedrag = ? WHERE id = ?";
         $params = [$klantId, $datum, $bedrag, $id];
-        return parent::voerQueryUit($query, $params);
+        $result = parent::voerQueryUit($query, $params);
+        if ($result === 0) {
+            $query = "INSERT INTO factuur (id, klant_id, datum, bedrag) VALUES (?, ?, ?, ?)";
+            $params = [$id, $klantId, $datum, $bedrag];
+            parent::voerQueryUit($query, $params);
+        }
     }
 
     public function deleteFactuur($id)
