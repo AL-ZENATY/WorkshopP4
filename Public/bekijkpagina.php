@@ -1,4 +1,4 @@
-<?php
+<?php   
 include "../Src/Klanten.php";
 include "../Src/Factuur.php";
 $klant = new Klanten();
@@ -28,7 +28,6 @@ if (isset($_GET['delete_note'])) {
 
 $notities = $conn->query("SELECT * FROM klant_notities WHERE klant_id = $id ORDER BY datum_toegevoegd DESC");
 
-// Materialenlijst
 $materialen = [
     'Verf' => 15.00,
     'Cement' => 12.50,
@@ -42,45 +41,36 @@ $materialen = [
     'Gipsplaat' => 6.00
 ];
 
-// Factuurregels
+// Ophalen van de geselecteerde producten
+$gekozen_materialen = isset($_POST['materiaal']) ? (array)$_POST['materiaal'] : ['Verf'];
+$aantallen_materialen = isset($_POST['aantal_materiaal']) ? $_POST['aantal_materiaal'] : [];
+
 $regels = [
-    ['aantal' => 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50],
-    // Materiaalregel wordt hieronder dynamisch toegevoegd
-    ['aantal' => 0, 'omschrijving' => 'Uurloon', 'prijs' => 7.99],
+    ['aantal' => isset($_POST['aantal_rij']) ? intval($_POST['aantal_rij']) : 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50]
 ];
 
-// Materiaalkeuze verwerken
-$gekozen_materiaal = isset($_POST['materiaal']) ? $_POST['materiaal'] : array_key_first($materialen);
-$materiaal_prijs = $materialen[$gekozen_materiaal];
+foreach ($gekozen_materialen as $materiaal) {
+    if (!isset($materialen[$materiaal])) continue;
+    $regels[] = [
+        'aantal' => isset($aantallen_materialen[$materiaal]) ? intval($aantallen_materialen[$materiaal]) : 0,
+        'omschrijving' => $materiaal,
+        'prijs' => $materialen[$materiaal]
+    ];
+}
 
-// Haal de aantallen uit POST, of zet op 0 als niet aanwezig
-$aantal_rij = isset($_POST['aantal'][0]) ? intval($_POST['aantal'][0]) : 0;
-$aantal_materiaal = isset($_POST['aantal_materiaal']) ? intval($_POST['aantal_materiaal']) : 0;
-$aantal_uur = isset($_POST['aantal'][2]) ? intval($_POST['aantal'][2]) : 0;
+$regels[] = ['aantal' => isset($_POST['aantal_uur']) ? intval($_POST['aantal_uur']) : 0, 'omschrijving' => 'Uurloon', 'prijs' => 7.99];
 
-// Voeg materiaalregel toe
-array_splice($regels, 1, 0, [[
-    'aantal' => $aantal_materiaal,
-    'omschrijving' => $gekozen_materiaal,
-    'prijs' => $materiaal_prijs
-]]);
-$regels[0]['aantal'] = $aantal_rij;
-$regels[2]['aantal'] = $aantal_uur;
-
-// Factuur berekenen en opslaan
 $totaal = 0;
 $btw = 0;
 $incl = 0;
-$factuur_id = null;
 $factuur_bon = null;
+$melding = "";
 
-// Bon verwijderen
 if (isset($_POST['verwijder_factuur']) && is_numeric($_POST['verwijder_factuur'])) {
     $factuurObj->deleteFactuur($_POST['verwijder_factuur']);
     $factuur_bon = null;
 }
 
-// Factuur berekenen en opslaan (alleen als op "Berekenen" is gedrukt)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
     foreach ($regels as $regel) {
         $totaal += $regel['aantal'] * $regel['prijs'];
@@ -88,33 +78,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
     $btw = $totaal * 0.21;
     $incl = $totaal + $btw;
 
-    // Alleen regels met aantal > 0 tonen op de bon
     $gekozen_regels = array_filter($regels, function($regel) {
         return $regel['aantal'] > 0;
     });
 
-    // Factuur opslaan in database
-    $datum = date('Y-m-d');
-    $factuurObj->updateFactuur($id, $id, $datum, $incl);
+    if (count($gekozen_regels) === 0) {
+        $melding = "Kies minimaal één product en vul het aantal in voordat je de factuur berekent.";
+    } else {
+        $datum = date('Y-m-d');
+        $factuurObj->updateFactuur($id, $id, $datum, $incl);
 
-    // Bon genereren
-    $factuur_bon = [
-        'id' => $id,
-        'klant' => $huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam'],
-        'regels' => $gekozen_regels,
-        'totaal' => $totaal,
-        'btw' => $btw,
-        'incl' => $incl,
-        'datum' => $datum
-    ];
+        $conn->query("DELETE FROM factuur_regels WHERE factuur_id = $id");
+        foreach ($gekozen_regels as $regel) {
+            $omschrijving = $conn->real_escape_string($regel['omschrijving']);
+            $prijs = floatval($regel['prijs']);
+            $aantal = intval($regel['aantal']);
+            $conn->query("INSERT INTO factuur_regels (factuur_id, omschrijving, prijs, aantal) VALUES ($id, '$omschrijving', $prijs, $aantal)");
+        }
 
-    // Factuurvelden resetten na berekenen
-    $aantal_rij = 0;
-    $aantal_materiaal = 0;
-    $aantal_uur = 0;
-    $regels[0]['aantal'] = 0;
-    $regels[1]['aantal'] = 0;
-    $regels[2]['aantal'] = 0;
+        $factuur_bon = [
+            'id' => $id,
+            'klant' => $huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam'],
+            'regels' => $gekozen_regels,
+            'totaal' => $totaal,
+            'btw' => $btw,
+            'incl' => $incl,
+            'datum' => $datum
+        ];
+    }
 }
 ?>
 
@@ -305,46 +296,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         .factuur-table input[type="number"] {
             width: 60px;
         }
+        .add-materiaal-btn {
+            margin: 8px 0 16px 0;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            cursor: pointer;
+        }
     </style>
     <script>
-        // Live prijsberekening in de factuur
         function updateFactuur() {
-            // Rij kosten
             let rijAantal = parseFloat(document.getElementById('aantal_rij').value) || 0;
             let rijPrijs = parseFloat(document.getElementById('prijs_rij').dataset.prijs);
             document.getElementById('bedrag_rij').innerText = "€ " + (rijAantal * rijPrijs).toFixed(2).replace('.', ',');
 
-            // Materiaal
-            let matAantal = parseFloat(document.getElementById('aantal_materiaal').value) || 0;
-            let matPrijs = parseFloat(document.getElementById('prijs_materiaal').dataset.prijs);
-            document.getElementById('bedrag_materiaal').innerText = "€ " + (matAantal * matPrijs).toFixed(2).replace('.', ',');
+            let subtotaal = rijAantal * rijPrijs;
 
-            // Uurloon
+            let materiaalRows = document.querySelectorAll('.materiaal-row');
+            materiaalRows.forEach(function(row) {
+                let aantal = parseFloat(row.querySelector('.aantal-materiaal').value) || 0;
+                let prijs = parseFloat(row.querySelector('.prijs-materiaal').dataset.prijs);
+                row.querySelector('.bedrag-materiaal').innerText = "€ " + (aantal * prijs).toFixed(2).replace('.', ',');
+                subtotaal += aantal * prijs;
+            });
+
             let uurAantal = parseFloat(document.getElementById('aantal_uur').value) || 0;
             let uurPrijs = parseFloat(document.getElementById('prijs_uur').dataset.prijs);
             document.getElementById('bedrag_uur').innerText = "€ " + (uurAantal * uurPrijs).toFixed(2).replace('.', ',');
+            subtotaal += uurAantal * uurPrijs;
 
-            // Totaal
-            let subtotaal = (rijAantal * rijPrijs) + (matAantal * matPrijs) + (uurAantal * uurPrijs);
             let btw = subtotaal * 0.21;
             let incl = subtotaal + btw;
             document.getElementById('subtotaal').innerText = "€ " + subtotaal.toFixed(2).replace('.', ',');
             document.getElementById('btw').innerText = "€ " + btw.toFixed(2).replace('.', ',');
             document.getElementById('incl').innerText = "€ " + incl.toFixed(2).replace('.', ',');
         }
+
+        function addMateriaalRow() {
+            let container = document.getElementById('materialen-container');
+            let index = container.children.length;
+            let materialen = <?= json_encode($materialen) ?>;
+            let row = document.createElement('tr');
+            row.className = 'materiaal-row';
+
+            let select = document.createElement('select');
+            select.name = 'materiaal[]';
+            select.required = true;
+            select.onchange = function() {
+                let prijs = materialen[this.value];
+                prijsTd.innerHTML = '€ ' + prijs.toFixed(2).replace('.', ',');
+                prijsTd.dataset.prijs = prijs;
+                aantalInput.value = 1;
+                updateFactuur();
+            };
+            for (let naam in materialen) {
+                let option = document.createElement('option');
+                option.value = naam;
+                option.text = naam;
+                select.appendChild(option);
+            }
+
+            let aantalInput = document.createElement('input');
+            aantalInput.type = 'number';
+            aantalInput.min = 0;
+            aantalInput.value = 1;
+            aantalInput.className = 'aantal-materiaal';
+            aantalInput.name = 'aantal_materiaal[' + select.value + ']';
+            aantalInput.oninput = updateFactuur;
+
+            let prijsTd = document.createElement('td');
+            prijsTd.className = 'prijs-materiaal';
+            prijsTd.dataset.prijs = materialen[select.value];
+            prijsTd.innerHTML = '€ ' + materialen[select.value].toFixed(2).replace('.', ',');
+
+            let bedragTd = document.createElement('td');
+            bedragTd.className = 'bedrag-materiaal';
+            bedragTd.innerHTML = '€ ' + materialen[select.value].toFixed(2).replace('.', ',');
+
+            let tdAantal = document.createElement('td');
+            tdAantal.appendChild(aantalInput);
+
+            let tdSelect = document.createElement('td');
+            tdSelect.appendChild(select);
+
+            row.appendChild(tdAantal);
+            row.appendChild(tdSelect);
+            row.appendChild(prijsTd);
+            row.appendChild(bedragTd);
+
+            container.appendChild(row);
+
+            updateFactuur();
+        }
+
         window.addEventListener('DOMContentLoaded', function() {
             updateFactuur();
             document.querySelectorAll('.factuur-table input, .factuur-table select').forEach(function(el) {
                 el.addEventListener('input', updateFactuur);
                 el.addEventListener('change', updateFactuur);
             });
+            document.getElementById('add-materiaal-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                addMateriaalRow();
+            });
         });
-        // Voorkom resetten van andere aantallen bij materiaalkeuze
-        function materiaalChange(sel) {
-            document.getElementById('hidden_aantal_rij').value = document.getElementById('aantal_rij').value;
-            document.getElementById('hidden_aantal_uur').value = document.getElementById('aantal_uur').value;
-            sel.form.submit();
-        }
     </script>
 </head>
 <body>
@@ -369,8 +426,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         </tr>
     </table>
 
-
-
+    <div class="flex-container">
+        <div class="column">
             <h2>Notitie toevoegen</h2>
             <form method="post">
                 <textarea name="notitie_inhoud" required></textarea>
@@ -394,9 +451,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
 
         <div class="column">
             <h2>Factuur</h2>
+            <?php if (!empty($melding)): ?>
+                <div style="color: red; font-weight: bold; margin-bottom: 10px;">
+                    <?= htmlspecialchars($melding) ?>
+                </div>
+            <?php endif; ?>
             <form method="post">
-                <input type="hidden" id="hidden_aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>">
-                <input type="hidden" id="hidden_aantal_uur" name="aantal[2]" value="<?= htmlspecialchars($aantal_uur) ?>">
                 <table class="factuur-table">
                     <tr>
                         <th>Aantal</th>
@@ -406,35 +466,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                     </tr>
                     <tr>
                         <td>
-                            <input type="number" min="0" id="aantal_rij" name="aantal[0]" value="<?= htmlspecialchars($aantal_rij) ?>" />
+                            <input type="number" min="0" id="aantal_rij" name="aantal_rij" value="<?= isset($_POST['aantal_rij']) ? htmlspecialchars($_POST['aantal_rij']) : 0 ?>" />
                         </td>
-                        <td><?= htmlspecialchars($regels[0]['omschrijving']) ?></td>
-                        <td id="prijs_rij" data-prijs="<?= $regels[0]['prijs'] ?>">€ <?= number_format($regels[0]['prijs'], 2, ',', '.') ?></td>
-                        <td id="bedrag_rij">€ <?= number_format($regels[0]['aantal'] * $regels[0]['prijs'], 2, ',', '.') ?></td>
+                        <td>Rij Kosten</td>
+                        <td id="prijs_rij" data-prijs="12.50">€ 12,50</td>
+                        <td id="bedrag_rij">€ 0,00</td>
+                    </tr>
+                    <tbody id="materialen-container">
+                        <?php
+                        if (!empty($gekozen_materialen)) {
+                            foreach ($gekozen_materialen as $materiaal) {
+                                if (!isset($materialen[$materiaal])) continue;
+                                $aantal = isset($aantallen_materialen[$materiaal]) ? intval($aantallen_materialen[$materiaal]) : 1;
+                                ?>
+                                <tr class="materiaal-row">
+                                    <td>
+                                        <input type="number" min="0" class="aantal-materiaal" name="aantal_materiaal[<?= htmlspecialchars($materiaal) ?>]" value="<?= $aantal ?>" />
+                                    </td>
+                                    <td>
+                                        <select name="materiaal[]" required>
+                                            <?php foreach ($materialen as $naam => $prijs): ?>
+                                                <option value="<?= $naam ?>" <?= $materiaal == $naam ? 'selected' : '' ?>><?= $naam ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
+                                    <td class="prijs-materiaal" data-prijs="<?= $materialen[$materiaal] ?>">€ <?= number_format($materialen[$materiaal], 2, ',', '.') ?></td>
+                                    <td class="bedrag-materiaal">€ <?= number_format($aantal * $materialen[$materiaal], 2, ',', '.') ?></td>
+                                </tr>
+                                <?php
+                            }
+                        }
+                        ?>
+                    </tbody>
+                    <tr>
+                        <td colspan="4">
+                            <button id="add-materiaal-btn" class="add-materiaal-btn">+ Product toevoegen</button>
+                        </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="number" min="0" id="aantal_materiaal" name="aantal_materiaal" value="<?= htmlspecialchars($aantal_materiaal) ?>" />
+                            <input type="number" min="0" id="aantal_uur" name="aantal_uur" value="<?= isset($_POST['aantal_uur']) ? htmlspecialchars($_POST['aantal_uur']) : 0 ?>" />
                         </td>
-                        <td>
-                            <select name="materiaal" id="materiaal" onchange="materiaalChange(this)">
-                                <?php foreach ($materialen as $naam => $prijs): ?>
-                                    <option value="<?= $naam ?>" <?= $gekozen_materiaal == $naam ? 'selected' : '' ?>>
-                                        <?= $naam ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                        <td id="prijs_materiaal" data-prijs="<?= $materiaal_prijs ?>">€ <?= number_format($materiaal_prijs, 2, ',', '.') ?></td>
-                        <td id="bedrag_materiaal">€ <?= number_format($regels[1]['aantal'] * $materiaal_prijs, 2, ',', '.') ?></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="number" min="0" id="aantal_uur" name="aantal[2]" value="<?= htmlspecialchars($aantal_uur) ?>" />
-                        </td>
-                        <td><?= htmlspecialchars($regels[2]['omschrijving']) ?></td>
-                        <td id="prijs_uur" data-prijs="<?= $regels[2]['prijs'] ?>">€ <?= number_format($regels[2]['prijs'], 2, ',', '.') ?></td>
-                        <td id="bedrag_uur">€ <?= number_format($regels[2]['aantal'] * $regels[2]['prijs'], 2, ',', '.') ?></td>
+                        <td>Uurloon</td>
+                        <td id="prijs_uur" data-prijs="7.99">€ 7,99</td>
+                        <td id="bedrag_uur">€ 0,00</td>
                     </tr>
                     <tr>
                         <td colspan="3" style="text-align:right;"><strong>Subtotaal</strong></td>
