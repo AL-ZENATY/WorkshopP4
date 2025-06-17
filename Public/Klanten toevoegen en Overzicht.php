@@ -147,6 +147,7 @@
         a:hover {
             text-decoration: underline;
             color: #4caf50;
+            
         }
     </style>
     <script>
