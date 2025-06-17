@@ -1,11 +1,37 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gegevens Pagina</title>
     <?php include "../Public/add_customer.php"; ?>
+    <?php
+    $zoekmelding = "";
+    include "../Src/Klanten.php";
+    $zoekenNaarObject = new Klanten();
+    $klanten = [];
+
+    if (isset($_POST["toon_alle"])) {
+        $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+    } elseif (isset($_POST["Zoekenen"])) {
+        $ZoekenOpAchternaam = $_POST['ZoekenOpAchternaam'] ?? '';
+        $ZoekenOpWoonplaats = $_POST['ZoekenOpWoonplaats'] ?? '';
+
+        if ($ZoekenOpAchternaam !== "" && $ZoekenOpWoonplaats !== "") {
+            $klanten = $zoekenNaarObject->getKlantByAchternaamEnWoonplaats($ZoekenOpAchternaam, $ZoekenOpWoonplaats);
+        } elseif ($ZoekenOpAchternaam !== "") {
+            $klanten = $zoekenNaarObject->getklantByAchternaam($ZoekenOpAchternaam);
+        } elseif ($ZoekenOpWoonplaats !== "") {
+            $klanten = $zoekenNaarObject->getklantByPlaats($ZoekenOpWoonplaats);
+        }
+
+        if (empty($klanten)) {
+            $zoekmelding = "🔍 Geen resultaten gevonden voor jouw zoekopdracht.";
+        }
+    } else {
+        $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
+    }
+    ?>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,8 +44,7 @@
             min-height: 100vh;
         }
 
-        h1,
-        h2 {
+        h1, h2 {
             color: #333;
         }
 
@@ -61,7 +86,6 @@
             cursor: pointer;
         }
 
-
         input[type="submit"]:hover {
             background-color: rgb(56, 180, 89);
         }
@@ -83,14 +107,13 @@
             border-collapse: collapse;
             width: 95%;
             max-width: 1100px;
-            background-color: #ffff;
+            background-color: #fff;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        th,
-        td {
+        th, td {
             padding: 14px 18px;
             border-bottom: 1px solid #ddd;
             text-align: left;
@@ -107,6 +130,12 @@
 
         .success-msg {
             color: green;
+            font-weight: bold;
+            margin-top: 16px;
+        }
+
+        .error-msg {
+            color: red;
             font-weight: bold;
             margin-top: 16px;
         }
@@ -130,73 +159,53 @@
         }
     </script>
 </head>
-
 <body>
     <h1>Overzicht Pagina</h1>
 
     <?php if ($klant_toegevoegd): ?>
         <p class="success-msg">✅ Klant succesvol toegevoegd!</p>
+    <?php elseif (!empty($foutmelding)): ?>
+        <p class="error-msg"><?= htmlspecialchars($foutmelding) ?></p>
     <?php endif; ?>
 
     <form method="post">
+        <input type="hidden" name="actie" value="klant_toevoegen">
         <label for="voornaam">Voornaam:</label>
         <input type="text" id="voornaam" name="voornaam" required>
-
         <label for="tussenvoegsel">Tussenvoegsel:</label>
         <input type="text" id="tussenvoegsel" name="tussenvoegsel">
-
         <label for="achternaam">Achternaam:</label>
         <input type="text" id="achternaam" name="achternaam" required>
-
         <label for="emailadres">Emailadres:</label>
         <input type="email" id="emailadres" name="emailadres" required>
-
         <label for="telefoonnummer">Telefoonnummer:</label>
         <input type="text" id="telefoonnummer" name="telefoonnummer" oninput="formatPhoneNumber(this)" required>
-
         <label>Adres:</label>
         <div class="adres-container">
-            <input type="text" name="straat" placeholder="straat" required>
+            <input type="text" name="straat" placeholder="Straat" required>
             <input type="text" name="huisnummer" placeholder="Huisnummer" required>
             <input type="text" name="postcode" placeholder="Postcode" required>
             <input type="text" name="plaats" placeholder="Plaats" required>
         </div>
         <input type="submit" value="Klant toevoegen">
     </form>
+
     <form method="POST">
         <label for="Zoeken">Zoeken:</label>
         <input type="text" name="ZoekenOpAchternaam" placeholder="Zoeken op achternaam: ">
         <input type="text" name="ZoekenOpWoonplaats" placeholder="Zoeken op woonplaats: ">
         <input type="submit" value="Zoeken" name="Zoekenen">
     </form>
-    <?php
-    include "../Src/Klanten.php";
-    $zoekenNaarObject = new Klanten();
-    if(isset($_POST["Zoekenen"]))
-        {
-        if (isset($_POST["ZoekenOpAchternaam"])) {
-            $ZoekenOpAchternaam = $_POST['ZoekenOpAchternaam'];
-        }
-        if (isset($_POST["ZoekenOpWoonplaats"])) {
-            $ZoekenOpWoonplaats = $_POST['ZoekenOpWoonplaats'];
-        }
-        if (isset($_POST["Zoekenen"])) {
-            {
-                if ($ZoekenOpAchternaam ==! "" && $ZoekenOpWoonplaats ==! "") {
-                    $klanten = $zoekenNaarObject->getKlantByAchternaamEnWoonplaats($ZoekenOpAchternaam, $ZoekenOpWoonplaats);
-                } elseif ($ZoekenOpAchternaam ==! "") {
-                    $klanten = $zoekenNaarObject->getklantByAchternaam($ZoekenOpAchternaam);
-                } elseif ($ZoekenOpWoonplaats ==! "") {
-                    $klanten = $zoekenNaarObject->getklantByPlaats($ZoekenOpWoonplaats);
-                } else {
-                    $klanten = $conn->query("SELECT id, voornaam, tussenvoegsel, achternaam, email, telefoonnummer, straat, huisnummer, postcode, plaats FROM klanten")->fetchAll(PDO::FETCH_ASSOC);
-                }
-            }
-        }
-    }
-    ?>
-    <?php
-    if (!empty($klanten)): ?>
+
+  <form method="POST" style="margin-top: -16px;">
+    <input type="submit" name="toon_alle" value="Toon alle klanten">
+</form>
+
+    <?php if (!empty($zoekmelding)): ?>
+        <p class="error-msg"><?= htmlspecialchars($zoekmelding) ?></p>
+    <?php endif; ?>
+
+    <?php if (!empty($klanten)): ?>
         <h2>Toegevoegde klanten</h2>
         <table>
             <thead>
@@ -220,15 +229,12 @@
                         <td><?= htmlspecialchars($klant['achternaam']) ?></td>
                         <td><?= htmlspecialchars($klant['email']) ?></td>
                         <td><?= htmlspecialchars($klant['telefoonnummer']) ?></td>
-                        <td><?= htmlspecialchars($klant['straat'] . ' ' . $klant['huisnummer'] . ', ' . $klant['postcode'] . ' ' . $klant['plaats']) ?>
-                        </td>
-                        <td><a href="bekijkpagina.php?id=<?php echo urlencode($klant['id']); ?>">Meer</a></td>
+                        <td><?= htmlspecialchars($klant['straat'] . ' ' . $klant['huisnummer'] . ', ' . $klant['postcode'] . ' ' . $klant['plaats']) ?></td>
+                        <td><a href="bekijkpagina.php?id=<?= urlencode($klant['id']) ?>">Meer</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
-    <?php endif;
-    ?>
+    <?php endif; ?>
 </body>
-
 </html>
