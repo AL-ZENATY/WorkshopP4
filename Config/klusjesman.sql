@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Gegenereerd op: 10 jun 2025 om 11:30
+-- Gegenereerd op: 17 jun 2025 om 11:32
 -- Serverversie: 5.7.17
 -- PHP-versie: 8.2.16
 
@@ -31,13 +31,48 @@ USE `klusjesman`;
 
 CREATE TABLE `factuur` (
   `id` int(11) NOT NULL,
-  `materiaal` varchar(1000) COLLATE utf8_bin NOT NULL,
-  `prijs` decimal(10,0) NOT NULL,
-  `aantal` int(11) NOT NULL,
-  `beschrijving` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `klant_id` int(11) NOT NULL,
   `datum` date NOT NULL,
   `bedrag` decimal(10,0) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `factuur`
+--
+
+INSERT INTO `factuur` (`id`, `klant_id`, `datum`, `bedrag`) VALUES
+(4, 9, '2025-06-17', 1104),
+(2, 13, '2025-06-17', 26),
+(3, 13, '2025-06-17', 16);
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `factuur_regels`
+--
+
+CREATE TABLE `factuur_regels` (
+  `id` int(11) NOT NULL,
+  `factuur_id` int(11) NOT NULL,
+  `omschrijving` varchar(1000) COLLATE utf8_bin NOT NULL,
+  `prijs` decimal(10,0) NOT NULL,
+  `aantal` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `factuur_regels`
+--
+
+INSERT INTO `factuur_regels` (`id`, `factuur_id`, `omschrijving`, `prijs`, `aantal`) VALUES
+(182, 4, 'Isolatie', 9, 100),
+(181, 4, 'Rij Kosten', 13, 1),
+(180, 3, 'Schroeven', 0, 5),
+(179, 3, 'Rij Kosten', 13, 1),
+(178, 2, 'Isolatie', 9, 1),
+(177, 2, 'Rij Kosten', 13, 1),
+(176, 1, 'Schroeven', 0, 500),
+(175, 1, 'Schroeven', 0, 500),
+(174, 1, 'Rij Kosten', 13, 2);
 
 -- --------------------------------------------------------
 
@@ -119,6 +154,12 @@ ALTER TABLE `factuur`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexen voor tabel `factuur_regels`
+--
+ALTER TABLE `factuur_regels`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexen voor tabel `klanten`
 --
 ALTER TABLE `klanten`
@@ -139,7 +180,13 @@ ALTER TABLE `klant_notities`
 -- AUTO_INCREMENT voor een tabel `factuur`
 --
 ALTER TABLE `factuur`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT voor een tabel `factuur_regels`
+--
+ALTER TABLE `factuur_regels`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
 
 --
 -- AUTO_INCREMENT voor een tabel `klanten`
