@@ -1,4 +1,4 @@
-<?php   
+<?php
 include "../Src/Klanten.php";
 include "../Src/Factuur.php";
 $klant = new Klanten();
@@ -46,7 +46,7 @@ $gekozen_materialen = isset($_POST['materiaal']) ? (array)$_POST['materiaal'] : 
 $aantallen_materialen = isset($_POST['aantal_materiaal']) ? $_POST['aantal_materiaal'] : [];
 
 $regels = [
-    ['aantal' => isset($_POST['aantal_rij']) ? intval($_POST['aantal_rij']) : 0, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50]
+    ['aantal' => isset($_POST['aantal_rij']) ? intval($_POST['aantal_rij']) : 1, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50]
 ];
 
 foreach ($gekozen_materialen as $materiaal) {
@@ -63,21 +63,15 @@ $regels[] = ['aantal' => isset($_POST['aantal_uur']) ? intval($_POST['aantal_uur
 $totaal = 0;
 $btw = 0;
 $incl = 0;
-$factuur_bon = null;
 $melding = "";
 
+// Bon verwijderen
 if (isset($_POST['verwijder_factuur']) && is_numeric($_POST['verwijder_factuur'])) {
     $factuurObj->deleteFactuur($_POST['verwijder_factuur']);
-    $factuur_bon = null;
 }
 
+// Factuur aanmaken en opslaan (elke keer een nieuwe bon)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
-    foreach ($regels as $regel) {
-        $totaal += $regel['aantal'] * $regel['prijs'];
-    }
-    $btw = $totaal * 0.21;
-    $incl = $totaal + $btw;
-
     $gekozen_regels = array_filter($regels, function($regel) {
         return $regel['aantal'] > 0;
     });
@@ -85,226 +79,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
     if (count($gekozen_regels) === 0) {
         $melding = "Kies minimaal één product en vul het aantal in voordat je de factuur berekent.";
     } else {
-        $datum = date('Y-m-d');
-        $factuurObj->updateFactuur($id, $id, $datum, $incl);
+        // Genereer nieuw factuurnummer (auto increment)
+        $result = $conn->query("SELECT MAX(id) as maxid FROM factuur");
+        $row = $result->fetch_assoc();
+        $nieuw_factuur_id = $row && $row['maxid'] ? $row['maxid'] + 1 : 1;
 
-        $conn->query("DELETE FROM factuur_regels WHERE factuur_id = $id");
+        $totaal = 0;
+        foreach ($gekozen_regels as $regel) {
+            $totaal += $regel['aantal'] * $regel['prijs'];
+        }
+        $btw = $totaal * 0.21;
+        $incl = $totaal + $btw;
+
+        $datum = date('Y-m-d');
+        $factuurObj->updateFactuur($nieuw_factuur_id, $id, $datum, $incl);
+
         foreach ($gekozen_regels as $regel) {
             $omschrijving = $conn->real_escape_string($regel['omschrijving']);
             $prijs = floatval($regel['prijs']);
             $aantal = intval($regel['aantal']);
-            $conn->query("INSERT INTO factuur_regels (factuur_id, omschrijving, prijs, aantal) VALUES ($id, '$omschrijving', $prijs, $aantal)");
+            $conn->query("INSERT INTO factuur_regels (factuur_id, omschrijving, prijs, aantal) VALUES ($nieuw_factuur_id, '$omschrijving', $prijs, $aantal)");
         }
 
-        $factuur_bon = [
-            'id' => $id,
-            'klant' => $huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam'],
-            'regels' => $gekozen_regels,
-            'totaal' => $totaal,
-            'btw' => $btw,
-            'incl' => $incl,
-            'datum' => $datum
+        // Reset formulier na bon aanmaken
+        $_POST = [];
+        $gekozen_materialen = ['Verf'];
+        $aantallen_materialen = [];
+        $regels = [
+            ['aantal' => 1, 'omschrijving' => 'Rij Kosten', 'prijs' => 12.50]
         ];
+        $regels[] = ['aantal' => 0, 'omschrijving' => 'Uurloon', 'prijs' => 7.99];
     }
 }
-?>
 
+// Haal alle facturen van deze klant op
+$alle_facturen = [];
+$result = $conn->query("SELECT * FROM factuur WHERE klant_id = $id ORDER BY id DESC");
+while ($factuur = $result->fetch_assoc()) {
+    $regels_uit_db = [];
+    $regels_result = $conn->query("SELECT * FROM factuur_regels WHERE factuur_id = " . intval($factuur['id']));
+    while ($regel = $regels_result->fetch_assoc()) {
+        $regels_uit_db[] = [
+            'omschrijving' => $regel['omschrijving'],
+            'aantal' => $regel['aantal'],
+            'prijs' => $regel['prijs']
+        ];
+    }
+    $totaal = 0;
+    foreach ($regels_uit_db as $regel) {
+        $totaal += $regel['prijs'] * $regel['aantal'];
+    }
+    $btw = $totaal * 0.21;
+    $incl = $totaal + $btw;
+    $alle_facturen[] = [
+        'id' => $factuur['id'],
+        'klant' => $huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam'],
+        'regels' => $regels_uit_db,
+        'totaal' => $totaal,
+        'btw' => $btw,
+        'incl' => $incl,
+        'datum' => $factuur['datum']
+    ];
+}
+?>
 <!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>Klantgegevens</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f7fa;
-            padding: 20px;
-            margin: 0;
-        }
-        h1 {
-            font-size: 28px;
-            color: #333;
-        }
-        .flex-container {
-            display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            align-items: flex-start;
-        }
-        .column {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            flex-direction: column;
-        }
-        table {
-            width: 100%;
-            max-width: 825px;
-            background-color: white;
-            border-collapse: collapse;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
-        th, td {
-            padding: 14px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #4caf50;
-            color: white;
-        }
-        textarea {
-            width: 100%;
-            max-width: 800px;
-            min-height: 100px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-        .btn {
-            padding: 10px 16px;
-            background-color: rgb(70, 229, 112);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            background-color: rgb(56, 180, 89);
-        }
-        .notitie {
-            background: white;
-            width: 100%;
-            max-width: 790px;
-            padding: 15px;
-            border-left: 4px solid #4caf50;
-            border-radius: 8px;
-            margin-top: 12px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        .notitie-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 8px;
-        }
-        .verwijder {
-            color: red;
-            font-size: 14px;
-        }
-        a {
-            text-decoration: none;
-            color: black;
-        }
-        a:hover {
-            color: #4caf50;
-            text-decoration: underline;
-        }
-        .bon-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            padding: 40px 40px 60px 40px;
-            margin-top: 30px;
-            max-width: 900px;
-            font-family: Arial, sans-serif;
-        }
-        .bon-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-        }
-        .bon-logo {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #bbb;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: #aaa;
-            font-weight: bold;
-            background-image: url('images.jpg');
-        }
-        .bon-title {
-            font-size: 48px;
-            font-weight: bold;
-            color: #444;
-            margin-bottom: 20px;
-        }
-        .bon-info-table {
-            width: 100%;
-            margin-bottom: 18px;
-        }
-        .bon-info-table th, .bon-info-table td {
-            text-align: left;
-            padding: 2px 8px 2px 0;
-            font-size: 15px;
-        }
-        .bon-info-table th {
-            font-weight: bold;
-            color: white;
-            width: 140px;
-        }
-        .bon-details-table {
-            width: 100%;
-            margin-bottom: 18px;
-        }
-        .bon-details-table th, .bon-details-table td {
-            text-align: left;
-            padding: 2px 8px 2px 0;
-            font-size: 15px;
-        }
-        .bon-details-table th {
-            font-weight: bold;
-            color: white;
-            width: 120px;
-        }
-        .bon-product-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-            margin-bottom: 18px;
-        }
-        .bon-product-table th, .bon-product-table td {
-            border-bottom: 1px solid #eee;
-            padding: 10px 8px;
-            font-size: 16px;
-        }
-        .bon-product-table th {
-            background: #f5f7fa;
-            color: #222;
-            font-weight: bold;
-        }
-        .bon-product-table tfoot td {
-            font-weight: bold;
-            background: #f5f7fa;
-        }
-        .bon-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            font-size: 14px;
-            color: #555;
-        }
-        .factuur-table input[type="number"] {
-            width: 60px;
-        }
-        .add-materiaal-btn {
-            margin: 8px 0 16px 0;
-            background: #4caf50;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 14px;
-            cursor: pointer;
-        }
+        body { font-family: Arial, sans-serif; background-color: #f5f7fa; padding: 20px; margin: 0; }
+        h1 { font-size: 28px; color: #333; }
+        .flex-container { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
+        table { width: 100%; max-width: 825px; background-color: white; border-collapse: collapse; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 12px; margin-bottom: 20px; flex-grow: 1; }
+        th, td { padding: 14px; border-bottom: 1px solid #ddd; }
+        th { background-color: #4caf50; color: white; }
+        textarea { width: 100%; max-width: 800px; min-height: 100px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+        .btn { padding: 10px 16px; background-color: rgb(70, 229, 112); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        .btn:hover { background-color: rgb(56, 180, 89); }
+        .notitie { background: white; width: 100%; max-width: 790px; padding: 15px; border-left: 4px solid #4caf50; border-radius: 8px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); }
+        .notitie-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .verwijder { color: red; font-size: 14px; }
+        a { text-decoration: none; color: black; }
+        a:hover { color: #4caf50; text-decoration: underline; }
+        .bon-container { background: #fff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 40px 40px 60px 40px; margin-top: 30px; max-width: 900px; font-family: Arial, sans-serif; }
+        .bon-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        .bon-logo { width: 120px; height: 120px; border: 2px dashed #bbb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #aaa; font-weight: bold; background-image: url('images.jpg'); }
+        .bon-title { font-size: 48px; font-weight: bold; color: #444; margin-bottom: 20px; }
+        .bon-info-table { width: 100%; margin-bottom: 18px; }
+        .bon-info-table th, .bon-info-table td { text-align: left; padding: 2px 8px 2px 0; font-size: 15px; }
+        .bon-info-table th { font-weight: bold; color: white; width: 140px; }
+        .bon-details-table { width: 100%; margin-bottom: 18px; }
+        .bon-details-table th, .bon-details-table td { text-align: left; padding: 2px 8px 2px 0; font-size: 15px; }
+        .bon-details-table th { font-weight: bold; color: white; width: 120px; }
+        .bon-product-table { width: 100%; border-collapse: collapse; margin-top: 18px; margin-bottom: 18px; }
+        .bon-product-table th, .bon-product-table td { border-bottom: 1px solid #eee; padding: 10px 8px; font-size: 16px; }
+        .bon-product-table th { background: #f5f7fa; color: #222; font-weight: bold; }
+        .bon-product-table tfoot td { font-weight: bold; background: #f5f7fa; }
+        .bon-footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 14px; color: #555; }
+        .factuur-table input[type="number"] { width: 60px; }
+        .add-materiaal-btn { margin: 8px 0 16px 0; background: #4caf50; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer; }
     </style>
     <script>
         function updateFactuur() {
@@ -336,7 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
 
         function addMateriaalRow() {
             let container = document.getElementById('materialen-container');
-            let index = container.children.length;
             let materialen = <?= json_encode($materialen) ?>;
             let row = document.createElement('tr');
             row.className = 'materiaal-row';
@@ -344,11 +218,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
             let select = document.createElement('select');
             select.name = 'materiaal[]';
             select.required = true;
+            select.className = 'materiaal-select';
             select.onchange = function() {
                 let prijs = materialen[this.value];
                 prijsTd.innerHTML = '€ ' + prijs.toFixed(2).replace('.', ',');
                 prijsTd.dataset.prijs = prijs;
                 aantalInput.value = 1;
+                aantalInput.name = 'aantal_materiaal[' + this.value + ']';
                 updateFactuur();
             };
             for (let naam in materialen) {
@@ -466,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                     </tr>
                     <tr>
                         <td>
-                            <input type="number" min="0" id="aantal_rij" name="aantal_rij" value="<?= isset($_POST['aantal_rij']) ? htmlspecialchars($_POST['aantal_rij']) : 0 ?>" />
+                            <input type="number" min="0" id="aantal_rij" name="aantal_rij" value="<?= isset($_POST['aantal_rij']) ? htmlspecialchars($_POST['aantal_rij']) : 1 ?>" />
                         </td>
                         <td>Rij Kosten</td>
                         <td id="prijs_rij" data-prijs="12.50">€ 12,50</td>
@@ -484,7 +360,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
                                         <input type="number" min="0" class="aantal-materiaal" name="aantal_materiaal[<?= htmlspecialchars($materiaal) ?>]" value="<?= $aantal ?>" />
                                     </td>
                                     <td>
-                                        <select name="materiaal[]" required>
+                                        <select name="materiaal[]" required onchange="this.parentNode.parentNode.querySelector('.aantal-materiaal').name='aantal_materiaal['+this.value+']';">
                                             <?php foreach ($materialen as $naam => $prijs): ?>
                                                 <option value="<?= $naam ?>" <?= $materiaal == $naam ? 'selected' : '' ?>><?= $naam ?></option>
                                             <?php endforeach; ?>
@@ -529,103 +405,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
         </div>
     </div>
 
-    <?php if ($factuur_bon): ?>
-        <div class="bon-container">
-            <div class="bon-header">
-                <div>
-                    <div class="bon-title">Factuur</div>
-                    <table class="bon-info-table">
-                        <tr>
-                            <th>Van</th>
-                            <td><strong>Timmerman</strong><br>Middelweg 10,<br>1139 Brussel, Belgie.</td>
-                        </tr>
-                        <tr>
-                            <th>Naar</th>
-                            <td>
-                                <strong><?= htmlspecialchars($factuur_bon['klant']) ?></strong><br>
-                                <?= htmlspecialchars($huidig['Straat'] . ' ' . $huidig['Huisnummer']) ?>,<br>
-                                <?= htmlspecialchars($huidig['Postcode'] . ' ' . $huidig['Plaats']) ?>
-                            </td>
-                        </tr>
-                    </table>
+    <?php if (!empty($alle_facturen)): ?>
+        <h2>Facturen van deze klant</h2>
+        <?php foreach ($alle_facturen as $factuur_bon): ?>
+            <div class="bon-container" style="margin-bottom: 40px;">
+                <div class="bon-header">
+                    <div>
+                        <div class="bon-title">Factuur</div>
+                        <table class="bon-info-table">
+                            <tr>
+                                <th>Van</th>
+                                <td><strong>Timmerman</strong><br>Middelweg 10,<br>1139 Brussel, Belgie.</td>
+                            </tr>
+                            <tr>
+                                <th>Naar</th>
+                                <td>
+                                    <strong><?= htmlspecialchars($factuur_bon['klant']) ?></strong><br>
+                                    <?= htmlspecialchars($huidig['Straat'] . ' ' . $huidig['Huisnummer']) ?>,<br>
+                                    <?= htmlspecialchars($huidig['Postcode'] . ' ' . $huidig['Plaats']) ?>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="bon-logo"></div>
                 </div>
-                <div class="bon-logo"></div>
-            </div>
-            <table class="bon-details-table">
-                <tr>
-                    <th>Factuurnummer</th>
-                    <td><?= htmlspecialchars($factuur_bon['id']) ?></td>
-                    <th>Factuurdatum</th>
-                    <td><?= htmlspecialchars($factuur_bon['datum']) ?></td>
-                </tr>
-                <tr>
-                    <th>Relatienummer</th>
-                    <td><?= htmlspecialchars($huidig['Id']) ?></td>
-                    <th>Vervaldag</th>
-                    <td><?= date('d.m.Y', strtotime($factuur_bon['datum'] . ' +30 days')) ?></td>
-                </tr>
-            </table>
-            <div style="margin-bottom:18px;">
-                <strong>Informatie over de opdracht of bestelling</strong><br>
-                Extra instructies of informatie.
-            </div>
-            <table class="bon-product-table">
-                <thead>
+                <table class="bon-details-table">
                     <tr>
-                        <th>Beschrijving</th>
-                        <th>Aantal</th>
-                        <th>Eenheid</th>
-                        <th>Tarief</th>
-                        <th>Totaal</th>
+                        <th>Factuurnummer</th>
+                        <td><?= htmlspecialchars($factuur_bon['id']) ?></td>
+                        <th>Factuurdatum</th>
+                        <td><?= htmlspecialchars($factuur_bon['datum']) ?></td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($factuur_bon['regels'] as $regel): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($regel['omschrijving']) ?></td>
-                            <td><?= htmlspecialchars($regel['aantal']) ?></td>
-                            <td><?= ($regel['omschrijving'] === 'Uurloon' ? 'Uur' : 'Stuk') ?></td>
-                            <td>€ <?= number_format($regel['prijs'], 2, ',', '.') ?></td>
-                            <td>€ <?= number_format($regel['aantal'] * $regel['prijs'], 2, ',', '.') ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
                     <tr>
-                        <td colspan="4" style="text-align:right;">Totaalbedrag</td>
-                        <td>€ <?= number_format($factuur_bon['incl'], 2, ',', '.') ?></td>
+                        <th>Relatienummer</th>
+                        <td><?= htmlspecialchars($huidig['Id']) ?></td>
+                        <th>Vervaldag</th>
+                        <td><?= date('d.m.Y', strtotime($factuur_bon['datum'] . ' +30 days')) ?></td>
                     </tr>
-                </tfoot>
-            </table>
-            <div class="bon-footer">
-                <div>
-                    <strong>Timmerman</strong><br>
-                    Middelweg 10<br>
-                    1139 Brussel<br>
-                    Ondernemingsnummer: 0123 456 789<br>
-                    BTW nummer: BE123456789
+                </table>
+                <div style="margin-bottom:18px;">
+                    <strong>Informatie over de opdracht of bestelling</strong><br>
+                    Extra instructies of informatie.
                 </div>
-                <div>
-                    <strong>Contact information</strong><br>
-                    Contactpersoon<br>
-                    Telefoon: 02 123 45 67<br>
-                    Email: contactpersoon@bedrijf.be<br>
-                    www.bedrijfsnaam.be
+                <table class="bon-product-table">
+                    <thead>
+                        <tr>
+                            <th>Beschrijving</th>
+                            <th>Aantal</th>
+                            <th>Eenheid</th>
+                            <th>Tarief</th>
+                            <th>Totaal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($factuur_bon['regels'] as $regel): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($regel['omschrijving']) ?></td>
+                                <td><?= htmlspecialchars($regel['aantal']) ?></td>
+                                <td><?= ($regel['omschrijving'] === 'Uurloon' ? 'Uur' : 'Stuk') ?></td>
+                                <td>€ <?= number_format($regel['prijs'], 2, ',', '.') ?></td>
+                                <td>€ <?= number_format($regel['aantal'] * $regel['prijs'], 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="text-align:right;">Totaalbedrag</td>
+                            <td>€ <?= number_format($factuur_bon['incl'], 2, ',', '.') ?></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="bon-footer">
+                    <div>
+                        <strong>Timmerman</strong><br>
+                        Middelweg 10<br>
+                        1139 Brussel<br>
+                        Ondernemingsnummer: 0123 456 789<br>
+                        BTW nummer: BE123456789
+                    </div>
+                    <div>
+                        <strong>Contact information</strong><br>
+                        Contactpersoon<br>
+                        Telefoon: 02 123 45 67<br>
+                        Email: contactpersoon@bedrijf.be<br>
+                        www.bedrijfsnaam.be
+                    </div>
+                    <div>
+                        <strong>Betaalgegevens</strong><br>
+                        Bank: ING Belgium NV<br>
+                        SWIFT/BIC: BBRUBEBB<br>
+                        IBAN: BE00 0000 0000 0000
+                    </div>
                 </div>
-                <div>
-                    <strong>Betaalgegevens</strong><br>
-                    Bank: ING Belgium NV<br>
-                    SWIFT/BIC: BBRUBEBB<br>
-                    IBAN: BE00 0000 0000 0000
-                </div>
+                <form method="post" style="margin-top: 20px;">
+                    <input type="hidden" name="verwijder_factuur" value="<?= htmlspecialchars($factuur_bon['id']) ?>">
+                    <button type="submit" class="btn" onclick="return confirm('Weet je zeker dat je deze bon wilt verwijderen?')">Verwijder bon</button>
+                </form>
             </div>
-            <form method="post" style="margin-top: 20px;">
-                <input type="hidden" name="verwijder_factuur" value="<?= htmlspecialchars($factuur_bon['id']) ?>">
-                <button type="submit" class="btn" onclick="return confirm('Weet je zeker dat je deze bon wilt verwijderen?')">Verwijder bon</button>
-            </form>
-        </div>
+        <?php endforeach; ?>
+    <?php else: ?>
     <?php endif; ?>
-
-    <p><a href="klanten toevoegen en Overzicht.php">← Terug naar overzicht pagina</a></p>
+    <p><a href="klanten toevoegen en overzicht.php">Terug naar overzicht</a></p>
 </body>
 </html>
