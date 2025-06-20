@@ -42,7 +42,7 @@ $materialen = [
 ];
 
 // Ophalen van de geselecteerde producten
-$gekozen_materialen = isset($_POST['materiaal']) ? (array)$_POST['materiaal'] : ['Verf'];
+$gekozen_materialen = isset($_POST['materiaal']) ? (array) $_POST['materiaal'] : ['Verf'];
 $aantallen_materialen = isset($_POST['aantal_materiaal']) ? $_POST['aantal_materiaal'] : [];
 
 $regels = [
@@ -50,7 +50,8 @@ $regels = [
 ];
 
 foreach ($gekozen_materialen as $materiaal) {
-    if (!isset($materialen[$materiaal])) continue;
+    if (!isset($materialen[$materiaal]))
+        continue;
     $regels[] = [
         'aantal' => isset($aantallen_materialen[$materiaal]) ? intval($aantallen_materialen[$materiaal]) : 0,
         'omschrijving' => $materiaal,
@@ -72,7 +73,7 @@ if (isset($_POST['verwijder_factuur']) && is_numeric($_POST['verwijder_factuur']
 
 // Factuur aanmaken en opslaan (elke keer een nieuwe bon)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bereken_factuur'])) {
-    $gekozen_regels = array_filter($regels, function($regel) {
+    $gekozen_regels = array_filter($regels, function ($regel) {
         return $regel['aantal'] > 0;
     });
 
@@ -145,42 +146,185 @@ while ($factuur = $result->fetch_assoc()) {
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <title>Klantgegevens</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f5f7fa; padding: 20px; margin: 0; }
-        h1 { font-size: 28px; color: #333; }
-        .flex-container { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
-        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
-        table { width: 100%; max-width: 825px; background-color: white; border-collapse: collapse; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 12px; margin-bottom: 20px; flex-grow: 1; }
-        th, td { padding: 14px; border-bottom: 1px solid #ddd; }
-        th { background-color: #4caf50; color: white; }
-        textarea { width: 100%; max-width: 800px; min-height: 100px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
-        .btn { padding: 10px 16px; background-color: rgb(70, 229, 112); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-        .btn:hover { background-color: rgb(56, 180, 89); }
-        .notitie { background: white; width: 100%; max-width: 790px; padding: 15px; border-left: 4px solid #4caf50; border-radius: 8px; margin-top: 12px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); }
-        .notitie-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-        .verwijder { color: red; font-size: 14px; }
-        a { text-decoration: none; color: black; }
-        a:hover { color: #4caf50; text-decoration: underline; }
-        .bon-container { background: #fff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 40px 40px 60px 40px; margin-top: 30px; max-width: 900px; font-family: Arial, sans-serif; }
-        .bon-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .bon-logo { width: 120px; height: 120px; border: 2px dashed #bbb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #aaa; font-weight: bold; background-image: url('images.jpg'); }
-        .bon-title { font-size: 48px; font-weight: bold; color: #444; margin-bottom: 20px; }
-        .bon-info-table { width: 100%; margin-bottom: 18px; }
-        .bon-info-table th, .bon-info-table td { text-align: left; padding: 2px 8px 2px 0; font-size: 15px; }
-        .bon-info-table th { font-weight: bold; color: white; width: 140px; }
-        .bon-details-table { width: 100%; margin-bottom: 18px; }
-        .bon-details-table th, .bon-details-table td { text-align: left; padding: 2px 8px 2px 0; font-size: 15px; }
-        .bon-details-table th { font-weight: bold; color: white; width: 120px; }
-        .bon-product-table { width: 100%; border-collapse: collapse; margin-top: 18px; margin-bottom: 18px; }
-        .bon-product-table th, .bon-product-table td { border-bottom: 1px solid #eee; padding: 10px 8px; font-size: 16px; }
-        .bon-product-table th { background: #f5f7fa; color: #222; font-weight: bold; }
-        .bon-product-table tfoot td { font-weight: bold; background: #f5f7fa; }
-        .bon-footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 14px; color: #555; }
-        .factuur-table input[type="number"] { width: 60px; }
-        .add-materiaal-btn { margin: 8px 0 16px 0; background: #4caf50; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Klantgegevens</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #333;
+    }
+
+    .layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .column-left,
+    .column-right {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    table {
+      width: 100%;
+      background-color: white;
+      border-collapse: collapse;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+    }
+
+    th,
+    td {
+      padding: 14px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background-color: rgb(70, 229, 112);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: rgb(56, 180, 89);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .notitie {
+      background: white;
+      padding: 15px;
+      border-left: 4px solid #4caf50;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .notitie-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .verwijder {
+      color: red;
+      font-size: 14px;
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+
+    a:hover {
+      color: #4caf50;
+      text-decoration: underline;
+    }
+
+    .factuur-table,
+    .bon-container {
+      width: 100%;
+    }
+
+    .bon-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      padding: 40px;
+    }
+
+    .bon-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .bon-logo {
+      width: 120px;
+      height: 120px;
+      border: 2px dashed #bbb;
+      border-radius: 50%;
+      background-image: url('../img/BaldHandymanLogo.png');
+      background-size: contain;
+    }
+
+    .bon-title {
+      font-size: 48px;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .bon-info-table th,
+    .bon-info-table td,
+    .bon-details-table th,
+    .bon-details-table td {
+      text-align: left;
+      padding: 4px 8px;
+      font-size: 15px;
+    }
+
+    .bon-product-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    .bon-product-table th,
+    .bon-product-table td {
+      border-bottom: 1px solid #eee;
+      padding: 10px 8px;
+      font-size: 16px;
+    }
+
+    .bon-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #555;
+      margin-top: 40px;
+    }
+
+    .factuur-table input[type="number"] {
+      width: 60px;
+    }
+
+    .add-materiaal-btn {
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+    }
+  </style>
     <script>
         function updateFactuur() {
             let rijAantal = parseFloat(document.getElementById('aantal_rij').value) || 0;
@@ -190,7 +334,7 @@ while ($factuur = $result->fetch_assoc()) {
             let subtotaal = rijAantal * rijPrijs;
 
             let materiaalRows = document.querySelectorAll('.materiaal-row');
-            materiaalRows.forEach(function(row) {
+            materiaalRows.forEach(function (row) {
                 let aantal = parseFloat(row.querySelector('.aantal-materiaal').value) || 0;
                 let prijs = parseFloat(row.querySelector('.prijs-materiaal').dataset.prijs);
                 row.querySelector('.bedrag-materiaal').innerText = "€ " + (aantal * prijs).toFixed(2).replace('.', ',');
@@ -219,7 +363,7 @@ while ($factuur = $result->fetch_assoc()) {
             select.name = 'materiaal[]';
             select.required = true;
             select.className = 'materiaal-select';
-            select.onchange = function() {
+            select.onchange = function () {
                 let prijs = materialen[this.value];
                 prijsTd.innerHTML = '€ ' + prijs.toFixed(2).replace('.', ',');
                 prijsTd.dataset.prijs = prijs;
@@ -267,19 +411,20 @@ while ($factuur = $result->fetch_assoc()) {
             updateFactuur();
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', function () {
             updateFactuur();
-            document.querySelectorAll('.factuur-table input, .factuur-table select').forEach(function(el) {
+            document.querySelectorAll('.factuur-table input, .factuur-table select').forEach(function (el) {
                 el.addEventListener('input', updateFactuur);
                 el.addEventListener('change', updateFactuur);
             });
-            document.getElementById('add-materiaal-btn').addEventListener('click', function(e) {
+            document.getElementById('add-materiaal-btn').addEventListener('click', function (e) {
                 e.preventDefault();
                 addMateriaalRow();
             });
         });
     </script>
 </head>
+
 <body>
     <h1><?= htmlspecialchars($huidig['Voornaam'] . ' ' . $huidig['Tussenvoegsel'] . ' ' . $huidig['Achternaam']) ?></h1>
     <h2>Gegevens</h2>
@@ -298,7 +443,8 @@ while ($factuur = $result->fetch_assoc()) {
         </tr>
         <tr>
             <th>Adres</th>
-            <td><?= $huidig['Straat'] . ' ' . $huidig['Huisnummer'] . ', ' . $huidig['Postcode'] . ' ' . $huidig['Plaats'] ?></td>
+            <td><?= $huidig['Straat'] . ' ' . $huidig['Huisnummer'] . ', ' . $huidig['Postcode'] . ' ' . $huidig['Plaats'] ?>
+            </td>
         </tr>
     </table>
 
@@ -318,7 +464,8 @@ while ($factuur = $result->fetch_assoc()) {
                         <p><?= nl2br(htmlspecialchars($note['inhoud'])) ?></p>
                         <div class="notitie-footer">
                             <small>Toegevoegd op: <?= $note['datum_toegevoegd'] ?></small>
-                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>" onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
+                            <a class="verwijder" href="?id=<?= $id ?>&delete_note=<?= $note['id'] ?>"
+                                onclick="return confirm('Verwijder deze notitie?')">Verwijder</a>
                         </div>
                     </div>
                 <?php endwhile; ?>
@@ -342,7 +489,8 @@ while ($factuur = $result->fetch_assoc()) {
                     </tr>
                     <tr>
                         <td>
-                            <input type="number" min="0" id="aantal_rij" name="aantal_rij" value="<?= isset($_POST['aantal_rij']) ? htmlspecialchars($_POST['aantal_rij']) : 1 ?>" />
+                            <input type="number" min="0" id="aantal_rij" name="aantal_rij"
+                                value="<?= isset($_POST['aantal_rij']) ? htmlspecialchars($_POST['aantal_rij']) : 1 ?>" />
                         </td>
                         <td>Rij Kosten</td>
                         <td id="prijs_rij" data-prijs="12.50">€ 12,50</td>
@@ -352,22 +500,29 @@ while ($factuur = $result->fetch_assoc()) {
                         <?php
                         if (!empty($gekozen_materialen)) {
                             foreach ($gekozen_materialen as $materiaal) {
-                                if (!isset($materialen[$materiaal])) continue;
+                                if (!isset($materialen[$materiaal]))
+                                    continue;
                                 $aantal = isset($aantallen_materialen[$materiaal]) ? intval($aantallen_materialen[$materiaal]) : 1;
                                 ?>
                                 <tr class="materiaal-row">
                                     <td>
-                                        <input type="number" min="0" class="aantal-materiaal" name="aantal_materiaal[<?= htmlspecialchars($materiaal) ?>]" value="<?= $aantal ?>" />
+                                        <input type="number" min="0" class="aantal-materiaal"
+                                            name="aantal_materiaal[<?= htmlspecialchars($materiaal) ?>]"
+                                            value="<?= $aantal ?>" />
                                     </td>
                                     <td>
-                                        <select name="materiaal[]" required onchange="this.parentNode.parentNode.querySelector('.aantal-materiaal').name='aantal_materiaal['+this.value+']';">
+                                        <select name="materiaal[]" required
+                                            onchange="this.parentNode.parentNode.querySelector('.aantal-materiaal').name='aantal_materiaal['+this.value+']';">
                                             <?php foreach ($materialen as $naam => $prijs): ?>
-                                                <option value="<?= $naam ?>" <?= $materiaal == $naam ? 'selected' : '' ?>><?= $naam ?></option>
+                                                <option value="<?= $naam ?>" <?= $materiaal == $naam ? 'selected' : '' ?>><?= $naam ?>
+                                                </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </td>
-                                    <td class="prijs-materiaal" data-prijs="<?= $materialen[$materiaal] ?>">€ <?= number_format($materialen[$materiaal], 2, ',', '.') ?></td>
-                                    <td class="bedrag-materiaal">€ <?= number_format($aantal * $materialen[$materiaal], 2, ',', '.') ?></td>
+                                    <td class="prijs-materiaal" data-prijs="<?= $materialen[$materiaal] ?>">€
+                                        <?= number_format($materialen[$materiaal], 2, ',', '.') ?></td>
+                                    <td class="bedrag-materiaal">€
+                                        <?= number_format($aantal * $materialen[$materiaal], 2, ',', '.') ?></td>
                                 </tr>
                                 <?php
                             }
@@ -381,7 +536,8 @@ while ($factuur = $result->fetch_assoc()) {
                     </tr>
                     <tr>
                         <td>
-                            <input type="number" min="0" id="aantal_uur" name="aantal_uur" value="<?= isset($_POST['aantal_uur']) ? htmlspecialchars($_POST['aantal_uur']) : 0 ?>" />
+                            <input type="number" min="0" id="aantal_uur" name="aantal_uur"
+                                value="<?= isset($_POST['aantal_uur']) ? htmlspecialchars($_POST['aantal_uur']) : 0 ?>" />
                         </td>
                         <td>Uurloon</td>
                         <td id="prijs_uur" data-prijs="7.99">€ 7,99</td>
@@ -499,7 +655,8 @@ while ($factuur = $result->fetch_assoc()) {
                 </div>
                 <form method="post" style="margin-top: 20px;">
                     <input type="hidden" name="verwijder_factuur" value="<?= htmlspecialchars($factuur_bon['id']) ?>">
-                    <button type="submit" class="btn" onclick="return confirm('Weet je zeker dat je deze bon wilt verwijderen?')">Verwijder bon</button>
+                    <button type="submit" class="btn"
+                        onclick="return confirm('Weet je zeker dat je deze bon wilt verwijderen?')">Verwijder bon</button>
                 </form>
             </div>
         <?php endforeach; ?>
@@ -507,4 +664,5 @@ while ($factuur = $result->fetch_assoc()) {
     <?php endif; ?>
     <p><a href="klanten toevoegen en overzicht.php">Terug naar overzicht</a></p>
 </body>
+
 </html>
